@@ -19,7 +19,12 @@
 .rdl-menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;
   height:1px;background:#DC9F2E;transition:width .3s ease;}
 .rdl-menu a:hover::after{width:100%;}
-.rdl-burger{display:none;}
+/* Le burger est masque nativement partout. Il ne reapparait sur
+   telephone que si cette feuille s'applique, donc si le script qui
+   l'anime est la aussi : un burger sans script ne ferait rien. */
+@media(max-width:767px){
+  .rdl-burger{display:block!important;}
+}
 
 @media(max-width:767px){
   .rdl-rangee{flex-direction:row!important;flex-wrap:wrap!important;
@@ -45,18 +50,6 @@
    index.html. Le H1 reste une seule balise, donc une seule phrase pour
    le referencement. */
 .rdl-h1 em{font-style:italic;color:#DC9F2E;}
-
-/* Cadrage des photos : trois images de rapports differents doivent
-   remplir des blocs de meme hauteur.
-
-   Positionnement absolu et non height:100% : un pourcentage de hauteur
-   ne se resout pas contre un parent qui n'a qu'un min-height, et l'image
-   garderait sa hauteur naturelle. */
-.rdl-photo{position:relative;overflow:hidden;}
-.rdl-photo > *{position:absolute;inset:0;margin:0;width:100%;height:100%;}
-.rdl-photo .elementor-widget-container,
-.rdl-photo figure,.rdl-photo a{width:100%;height:100%;margin:0;}
-.rdl-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 
 /* Les trois calques de la lampe torche. */
 #rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;

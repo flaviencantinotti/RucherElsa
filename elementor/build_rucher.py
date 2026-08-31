@@ -265,13 +265,17 @@ def image_fond(fichier, ratio=340, rayon=6, bordure=TRAIT_MIEL, alt="",
     conteneur : sans elle, trois photos de rapports differents donneraient
     trois hauteurs differentes.
     """
+    # La hauteur et le recadrage sont des reglages natifs du widget
+    # Image, pas du CSS : ainsi la photo remplit son cadre meme si le
+    # bloc d'effets ne s'applique pas.
     return conteneur([
         w("image", image={"url": photo(fichier), "id": "", "alt": alt,
                           "source": "url"},
-          image_size="full", align="center", width=t(100, "%")),
-    ], content_width="full", width=t(100, "%"), min_height=t(ratio),
-        _css_classes="rdl-photo", overflow="hidden",
-        padding=uni(0),
+          image_size="full", align="center",
+          width=t(100, "%"), height=t(ratio),
+          **{"object-fit": "cover", "object-position": "center center"}),
+    ], content_width="full", width=t(100, "%"),
+        _css_classes="rdl-photo", overflow="hidden", padding=uni(0),
         border_border="solid", border_width=uni(1),
         border_color=bordure, border_radius=uni(rayon))
 
@@ -358,6 +362,7 @@ def nav():
     burger = w("button", text="☰", link=url("#"), align="right",
                _css_classes="rdl-burger",
                hide_desktop="hidden-desktop", hide_tablet="hidden-tablet",
+               hide_mobile="hidden-mobile",
                button_text_color=CREME, background_color="rgba(0,0,0,0)",
                hover_color=MIEL,
                button_background_hover_color="rgba(0,0,0,0)",
@@ -388,7 +393,10 @@ def nav():
         # defilement et le flou passent par la feuille de style du bloc
         # d'effets, faute d'equivalent en Elementor gratuit.
         _css_classes="rdl-nav", z_index=50,
-        background_color="rgba(10,9,8,0.72)",
+        # Opaque, et non translucide : la transparence n'avait de sens
+        # qu'avec le flou du bloc d'effets. Si celui-ci ne s'applique
+        # pas, 72 % de noir sur un corps de page clair donnent du gris.
+        background_color=NOIR,
         border_border="solid", border_width=esp(0, 0, 1, 0),
         border_color=TRAIT)
 
@@ -669,7 +677,12 @@ EFFETS = """<style>
 .rdl-menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;
   height:1px;background:%(miel)s;transition:width .3s ease;}
 .rdl-menu a:hover::after{width:100%%;}
-.rdl-burger{display:none;}
+/* Le burger est masque nativement partout. Il ne reapparait sur
+   telephone que si cette feuille s'applique, donc si le script qui
+   l'anime est la aussi : un burger sans script ne ferait rien. */
+@media(max-width:767px){
+  .rdl-burger{display:block!important;}
+}
 
 @media(max-width:767px){
   .rdl-rangee{flex-direction:row!important;flex-wrap:wrap!important;
@@ -695,18 +708,6 @@ EFFETS = """<style>
    index.html. Le H1 reste une seule balise, donc une seule phrase pour
    le referencement. */
 .rdl-h1 em{font-style:italic;color:%(miel)s;}
-
-/* Cadrage des photos : trois images de rapports differents doivent
-   remplir des blocs de meme hauteur.
-
-   Positionnement absolu et non height:100%% : un pourcentage de hauteur
-   ne se resout pas contre un parent qui n'a qu'un min-height, et l'image
-   garderait sa hauteur naturelle. */
-.rdl-photo{position:relative;overflow:hidden;}
-.rdl-photo > *{position:absolute;inset:0;margin:0;width:100%%;height:100%%;}
-.rdl-photo .elementor-widget-container,
-.rdl-photo figure,.rdl-photo a{width:100%%;height:100%%;margin:0;}
-.rdl-photo img{width:100%%;height:100%%;object-fit:cover;display:block;}
 
 /* Les trois calques de la lampe torche. */
 #rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;

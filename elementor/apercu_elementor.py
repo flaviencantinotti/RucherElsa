@@ -204,9 +204,31 @@ def bloc_css(sel, d):
     return "%s{%s}" % (sel, "".join("%s:%s;" % kv for kv in d.items()))
 
 
-def variantes(s, conteneur, cl, css, css_tab, css_mob):
+# Masquage responsive natif d'Elementor : hide_desktop, hide_tablet et
+# hide_mobile posent des classes qu'Elementor masque via sa propre
+# feuille. L'apercu doit les honorer, sinon il montre visible ce que
+# WordPress cache — c'est ce qui m'a fait croire le burger corrige.
+MASQUAGE = {"hide_desktop": (TABLETTE + 1, None),
+            "hide_tablet": (MOBILE + 1, TABLETTE),
+            "hide_mobile": (None, MOBILE)}
+
+
+def regles_masquage(s, cl, css, css_tab, css_mob, css_plage):
+    for cle, (mini, maxi) in MASQUAGE.items():
+        if not s.get(cle):
+            continue
+        if cle == "hide_desktop":
+            css.append(".%s{display:none!important}" % cl)
+        elif cle == "hide_tablet":
+            css_plage.append(".%s{display:none!important}" % cl)
+        else:
+            css_mob.append(".%s{display:none!important}" % cl)
+
+
+def variantes(s, conteneur, cl, css, css_tab, css_mob, css_plage):
     """Genere la regle bureau et ses declinaisons tablette et mobile."""
     css.append(bloc_css("." + cl, regles(s, conteneur)))
+    regles_masquage(s, cl, css, css_tab, css_mob, css_plage)
     for suffixe, cible in (("_tablet", css_tab), ("_mobile", css_mob)):
         sous = {k[:-len(suffixe)]: v for k, v in s.items()
                 if k.endswith(suffixe)}
@@ -249,12 +271,22 @@ def rendre_widget(el, cl):
         return "<div class='%s' style='height:%s'></div>" % (
             cl, px(s.get("space")) or "20px")
     if wt == "image":
+        # Hauteur et recadrage natifs du widget Image.
+        sup = []
+        if px(s.get("height")):
+            sup.append("height:%s" % px(s["height"]))
+        if s.get("object-fit"):
+            sup.append("object-fit:%s" % s["object-fit"])
+        if s.get("object-position"):
+            sup.append("object-position:%s" % s["object-position"])
+        style_sup = (" style=\"%s\"" % ";".join(sup)) if sup else ""
         im = s.get("image") or {}
         src = im.get("url")
         if src:
             # Vraie balise, avec son alt : c'est ce qu'on cherche a verifier.
-            return ("<img class='%s' src='%s' alt='%s'>"
-                    % (cl, src, im.get("alt", "").replace("'", "&#39;")))
+            return ("<img class='%s' src='%s' alt='%s'%s>"
+                    % (cl, src, im.get("alt", "").replace("'", "&#39;"),
+                       style_sup))
         return "<div class='%s w-img'>emplacement image</div>" % cl
     if wt == "html":
         # Rendu tel quel : c'est le seul moyen de verifier que le bloc
@@ -266,10 +298,11 @@ def rendre_widget(el, cl):
     return "<div class='%s'>[%s]</div>" % (cl, wt)
 
 
-def rendre(el, css, css_tab, css_mob):
+def rendre(el, css, css_tab, css_mob, css_plage):
     cl = classe()
     conteneur = el["elType"] == "container"
-    variantes(el["settings"], conteneur, cl, css, css_tab, css_mob)
+    variantes(el["settings"], conteneur, cl, css, css_tab, css_mob,
+              css_plage)
 
     # Les classes personnalisees valent aussi pour les widgets : c'est par
     # elles que passent le H1 et les cartes hexagonales.
@@ -280,7 +313,7 @@ def rendre(el, css, css_tab, css_mob):
 
     if sup:
         cl = cl + " " + sup
-    dedans = "".join(rendre(e, css, css_tab, css_mob) for e in el["elements"])
+    dedans = "".join(rendre(e, css, css_tab, css_mob, css_plage) for e in el["elements"])
     if el["settings"].get("content_width") == "boxed":
         largeur = px(el["settings"].get("boxed_width")) or "1140px"
         aligne = el["settings"].get("flex_align_items") or "stretch"
@@ -325,12 +358,16 @@ def polices_utilisees(el, vues):
 
 def construire(chemin_json):
     doc = json.load(open(chemin_json, encoding="utf-8"))
-    css, css_tab, css_mob = [], [], []
-    corps = "".join(rendre(s, css, css_tab, css_mob) for s in doc["content"])
+    css, css_tab, css_mob, css_plage = [], [], [], []
+    corps = "".join(rendre(s, css, css_tab, css_mob, css_plage)
+                    for s in doc["content"])
 
     feuille = BASE + "".join(css)
     feuille += "@media(max-width:%dpx){%s}" % (TABLETTE, "".join(css_tab))
     feuille += "@media(max-width:%dpx){%s}" % (MOBILE, "".join(css_mob))
+    # Masquage limite a la plage tablette, comme elementor-hidden-tablet.
+    feuille += "@media(min-width:%dpx) and (max-width:%dpx){%s}" % (
+        MOBILE + 1, TABLETTE, "".join(css_plage))
 
     familles = set()
     for sec in doc["content"]:
