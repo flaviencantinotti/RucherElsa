@@ -240,7 +240,13 @@ def rendre_widget(el, cl):
         return "<div class='%s' style='height:%s'></div>" % (
             cl, px(s.get("space")) or "20px")
     if wt == "image":
-        return ("<div class='%s w-img'>emplacement image</div>" % cl)
+        im = s.get("image") or {}
+        src = im.get("url")
+        if src:
+            # Vraie balise, avec son alt : c'est ce qu'on cherche a verifier.
+            return ("<img class='%s' src='%s' alt='%s'>"
+                    % (cl, src, im.get("alt", "").replace("'", "&#39;")))
+        return "<div class='%s w-img'>emplacement image</div>" % cl
     if wt == "html":
         # Rendu tel quel : c'est le seul moyen de verifier que le bloc
         # d'effets produit bien ce qu'on attend.

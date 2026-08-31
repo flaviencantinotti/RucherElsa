@@ -25,7 +25,9 @@ MIEL = "#DC9F2E"        # dore : accents, surtitres, boutons
 MIEL_CLAIR = "#F0C878"  # dore clair : survols
 CREME = "#F5EFE1"       # texte principal
 CREME_DOUX = "#A89F8C"  # texte secondaire
-ROUILLE = "#7A4B23"     # numeros de carte
+ROUILLE = "#B87A3D"     # numeros de carte. Eclairci : le #7A4B23
+                        # d'origine tombait a 2,6:1 sur le fond des
+                        # cartes, sous le seuil WCAG AA de 4,5:1.
 TRAIT = "rgba(245,239,225,0.10)"
 TRAIT_MIEL = "rgba(220,159,46,0.25)"
 
@@ -224,26 +226,28 @@ def espace(px=30):
     return w("spacer", space=t(px))
 
 
-def image_fond(fichier, ratio=340, rayon=6, bordure=TRAIT_MIEL, libelle="",
+def image_fond(fichier, ratio=340, rayon=6, bordure=TRAIT_MIEL, alt="",
                voile=0.25):
-    """Bloc photo : l'image en arriere-plan, sous un leger voile sombre.
+    """Bloc photo : un vrai widget Image, pas un fond de conteneur.
 
-    Reprend le procede du site actuel, ou chaque visuel est assombri pour
-    que le texte doré garde son contraste. L'image reste remplacable au
-    panneau : Style > Arriere-plan > Image.
+    Une image d'arriere-plan n'a pas de texte alternatif, n'apparait pas
+    dans Google Images et reste muette pour un lecteur d'ecran. Le site
+    d'origine utilisait bien des balises <img> pour ces trois visuels :
+    on garde la meme semantique.
+
+    Le cadrage passe par la classe rdl-photo, qui applique object-fit au
+    conteneur : sans elle, trois photos de rapports differents donneraient
+    trois hauteurs differentes.
     """
-    return conteneur([], content_width="full", width=t(100, "%"),
-                     min_height=t(ratio),
-                     background_background="classic",
-                     background_image={"url": photo(fichier), "id": "",
-                                       "source": "url"},
-                     background_size="cover",
-                     background_position="center center",
-                     background_repeat="no-repeat",
-                     background_overlay_background="classic",
-                     background_overlay_color="rgba(10,9,8,%s)" % voile,
-                     border_border="solid", border_width=uni(1),
-                     border_color=bordure, border_radius=uni(rayon))
+    return conteneur([
+        w("image", image={"url": photo(fichier), "id": "", "alt": alt,
+                          "source": "url"},
+          image_size="full", align="center", width=t(100, "%")),
+    ], content_width="full", width=t(100, "%"), min_height=t(ratio),
+        _css_classes="rdl-photo", overflow="hidden",
+        padding=uni(0),
+        border_border="solid", border_width=uni(1),
+        border_color=bordure, border_radius=uni(rayon))
 
 
 # --- Assemblages ------------------------------------------------------------
@@ -353,8 +357,8 @@ def hero():
             col_auto([bouton_fantome("Notre histoire", "#histoire")]),
         ], g=14),
     ], pct=54, tab=100, g=20)
-    droite = colonne([image_fond("abeille1.jpg", 460,
-                                 libelle="Photo — Elsa au rucher")],
+    droite = colonne([image_fond("abeille1.jpg", 600,
+                                 alt="Abeille butinant sur des épis secs")],
                      pct=40, tab=100)
     return section([rangee([gauche, droite], g=52, align="center")],
                    haut=96, bas=110, _element_id="hero")
@@ -369,8 +373,8 @@ def histoire():
                      ("12", "ans de pratique")]
     ], g=40)
     return section([rangee([
-        colonne([image_fond("abeille2.jpg", 460,
-                            libelle="Photo — cadre de hausse")],
+        colonne([image_fond("abeille2.jpg", 580,
+                            alt="Abeille domestique en gros plan")],
                 pct=42, tab=100),
         colonne([
             surtitre("Notre histoire"),
@@ -478,8 +482,8 @@ def pollinisation():
             espace(8),
             bouton("Demander un devis", "#contact"),
         ], pct=52, tab=100, g=18, animation="fadeInUp"),
-        colonne([image_fond("abeille3.jpg", 440,
-                            libelle="Photo — verger en pollinisation")],
+        colonne([image_fond("abeille3.jpg", 470,
+                            alt="Rayon de miel operculé dont le miel s'écoule")],
                 pct=42, tab=100),
     ], g=52, align="center")], haut=120, bas=120,
         border_border="solid", border_width=esp(1, 0, 0, 0),
@@ -515,14 +519,19 @@ def pied():
         liste_liens([("contact@rucherdelsa.fr",
                       "mailto:contact@rucherdelsa.fr"),
                      ("06 00 00 00 00", "tel:0600000000"),
-                     ("14 chemin des Lavandières, 84220 Gordes", "#")],
+                     ("14 chemin des Lavandières, 84220 Gordes",
+                      "https://www.google.com/maps/search/"
+                      "?api=1&query=14+chemin+des+Lavandi%C3%A8res+84220+Gordes")],
                     px=14, ecart=8, couleur=CREME_DOUX),
     ], pct=26, tab=46, g=14)
 
     bas = rangee([
         colonne([para("<p>© 2026 Le Rucher d'Elsa</p>", px=12.5)], pct=46),
-        colonne([liste_liens([("Mentions légales", "#"),
-                              ("Politique de confidentialité", "#")],
+        # Ces deux pages restent a creer dans WordPress ; pointer leur
+        # futur permalien vaut mieux qu'un « # » qui ne mene nulle part.
+        colonne([liste_liens([("Mentions légales", "/mentions-legales/"),
+                              ("Politique de confidentialité",
+                               "/politique-de-confidentialite/")],
                              inline=True, px=12.5, ecart=16,
                              couleur=CREME_DOUX)], pct=50),
     ], g=16, align="center")
@@ -552,7 +561,8 @@ def gabarits():
     return section([
         colonne([
             surtitre("Gabarits — à supprimer avant mise en ligne"),
-            titre("Conteneurs vierges à dupliquer.", px=30, tab=26, mob=23),
+            titre("Conteneurs vierges à dupliquer.", niveau="div", px=30,
+                  tab=26, mob=23),
             para("Clic droit sur un conteneur → Dupliquer, puis glissez-y vos "
                  "widgets. Largeurs et responsive sont déjà réglés.", px=15),
         ], pct=70, tab=100),
@@ -604,6 +614,14 @@ EFFETS = """<style>
   .rdl-hexcard{clip-path:none;border-radius:6px;}
 }
 
+/* Cadrage des photos : trois images de rapports differents doivent
+   remplir des blocs de meme hauteur. */
+.rdl-photo{display:flex;}
+.rdl-photo .elementor-widget-image,
+.rdl-photo .elementor-widget-container,
+.rdl-photo figure,.rdl-photo a{width:100%%;height:100%%;margin:0;}
+.rdl-photo img{width:100%%;height:100%%;object-fit:cover;display:block;}
+
 /* Les trois calques de la lampe torche. */
 #rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;
   pointer-events:none;}
@@ -618,6 +636,30 @@ EFFETS = """<style>
 /* Sans pointeur a suivre, le halo resterait fige au centre. */
 @media (hover:none){#rdl-glow,#rdl-vignette{display:none;}}
 </style>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"LocalBusiness",
+  "additionalType":"https://schema.org/Farm",
+  "name":"Le Rucher d'Elsa",
+  "description":"Apiculture artisanale en Provence-Alpes-Cote d'Azur. Miels de printemps, garrigue et lavande, recoltes a la main et extraits a froid. Pollinisation de vergers.",
+  "address":{
+    "@type":"PostalAddress",
+    "streetAddress":"14 chemin des Lavandieres",
+    "postalCode":"84220",
+    "addressLocality":"Gordes",
+    "addressRegion":"Vaucluse",
+    "addressCountry":"FR"
+  },
+  "email":"contact@rucherdelsa.fr",
+  "priceRange":"8-10 EUR",
+  "makesOffer":[
+    {"@type":"Offer","itemOffered":{"@type":"Product","name":"Miel toutes fleurs de printemps"},"price":"8.90","priceCurrency":"EUR"},
+    {"@type":"Offer","itemOffered":{"@type":"Product","name":"Miel de garrigue"},"price":"9.90","priceCurrency":"EUR"},
+    {"@type":"Offer","itemOffered":{"@type":"Product","name":"Miel de lavande"},"price":"9.50","priceCurrency":"EUR"}
+  ]
+}
+</script>
 <div id="rdl-hexfield"></div>
 <div id="rdl-vignette"></div>
 <div id="rdl-glow"></div>

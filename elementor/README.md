@@ -99,6 +99,52 @@ conteneur : vous perdez les trois effets, tout le reste tient debout.
 Les apparitions au défilement, elles, sont natives : elles passent par
 l'animation d'entrée d'Elementor, disponible en version gratuite.
 
+## SEO et accessibilité
+
+Ce que le template porte déjà :
+
+- **Un seul H1**, puis 4 H2 et 3 H3 — hiérarchie propre, sans niveau sauté.
+- **Trois vraies balises `<img>`** avec texte alternatif pour le hero,
+  l'histoire et la pollinisation. Une image d'arrière-plan n'a pas d'alt,
+  n'apparaît pas dans Google Images et reste muette pour un lecteur d'écran.
+  Seules les cartes de miel gardent une image de fond — comme dans le site
+  d'origine, où elles en étaient déjà une.
+- **Des données structurées `LocalBusiness`** en JSON-LD, dans le bloc
+  d'effets : nom, description, adresse complète, courriel, fourchette de prix,
+  et les trois miels en `Offer`. C'est ce qui permet à Google d'afficher
+  l'atelier sur une recherche « miel Gordes » ou « apiculteur Vaucluse ».
+- **Contrastes conformes WCAG AA** : le crème est à 17,4:1 sur le noir, le
+  doré à 8,6:1. Les numéros de carte ont été éclaircis de `#7A4B23` à
+  `#B87A3D` — la valeur d'origine tombait à 2,6:1, sous le seuil de 4,5:1.
+- **Aucun lien mort** : 18 liens, toutes les ancres résolues.
+
+### Textes alternatifs
+
+Ceux du site d'origine décrivaient autre chose que les photos —
+« Verger en pollinisation » sur un rayon de miel, « Elsa au rucher » sur une
+abeille seule. Un alt qui ment est pire qu'un alt absent pour qui navigue au
+lecteur d'écran. Ils ont été réécrits d'après les images réelles.
+
+Ils sont posés dans le template, mais **Elementor lit l'alt depuis la
+médiathèque** une fois l'image envoyée. Après le passage en médiathèque,
+recopiez-les dans le champ *Texte alternatif* de chaque fichier.
+
+### À régler dans WordPress
+
+Le titre et la méta-description ne sont pas dans le template — ils se règlent
+au niveau de la page, via Yoast, Rank Math ou l'onglet *Réglages de la page*.
+Propositions :
+
+| | |
+| --- | --- |
+| Titre | Le Rucher d'Elsa — miel artisanal de Provence, Gordes (84) |
+| Description | Miels de printemps, garrigue et lavande, récoltés à la main et extraits à froid à Gordes. Vente au magasin et pollinisation de vergers. |
+
+Le H1 dit aujourd'hui « Le Rucher d'Elsa », sans mention du métier ni du lieu.
+Pour le référencement local, « Le Rucher d'Elsa — apicultrice à Gordes »
+travaillerait mieux. C'est un choix éditorial, pas une correction technique :
+le template n'a pas été modifié sur ce point.
+
 ## Vérifier avant d'importer
 
 ```bash
