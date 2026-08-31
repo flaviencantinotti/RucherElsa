@@ -50,7 +50,10 @@ miel en hexagones n'a pas d'équivalent dans le panneau. Les cartes sont des
 rectangles à coins légèrement arrondis, avec le même fond et la même bordure.
 
 **La lampe torche.** Le halo doré qui suit la souris, la trame hexagonale de
-fond et la vignette sont trois calques animés en JavaScript. Ils sont absents.
+fond et la vignette sont trois calques animés en JavaScript. Absents de la
+page principale, mais récupérables : voir `effet-torche/`. La trame et la
+vignette se refont entièrement dans le panneau, sans code ; seul le suivi du
+pointeur demande quatre lignes de JavaScript, isolées dans un widget dédié.
 
 **L'en-tête fixe.** Le *sticky* est une fonction Elementor Pro. La barre reste
 en haut de page au lieu de suivre le défilement.
