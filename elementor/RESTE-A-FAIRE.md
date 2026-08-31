@@ -1,6 +1,7 @@
 # Reste à faire
 
-État au 31 août 2026. Branche `elementor-template`, commit `aa9ed9e`.
+État au 31 août 2026, après audit complet. Branche
+`elementor-template`.
 
 ## À faire dans WordPress
 

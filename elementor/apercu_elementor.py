@@ -262,10 +262,13 @@ def rendre(el, css, css_tab, css_mob):
     conteneur = el["elType"] == "container"
     variantes(el["settings"], conteneur, cl, css, css_tab, css_mob)
 
-    if not conteneur:
-        return rendre_widget(el, cl)
-
+    # Les classes personnalisees valent aussi pour les widgets : c'est par
+    # elles que passent le H1 et les cartes hexagonales.
     sup = el["settings"].get("_css_classes")
+
+    if not conteneur:
+        return rendre_widget(el, cl + (" " + sup if sup else ""))
+
     if sup:
         cl = cl + " " + sup
     dedans = "".join(rendre(e, css, css_tab, css_mob) for e in el["elements"])

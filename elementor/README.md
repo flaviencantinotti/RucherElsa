@@ -140,10 +140,15 @@ Propositions :
 | Titre | Le Rucher d'Elsa — miel artisanal de Provence, Gordes (84) |
 | Description | Miels de printemps, garrigue et lavande, récoltés à la main et extraits à froid à Gordes. Vente au magasin et pollinisation de vergers. |
 
-Le H1 dit aujourd'hui « Le Rucher d'Elsa », sans mention du métier ni du lieu.
-Pour le référencement local, « Le Rucher d'Elsa — apicultrice à Gordes »
-travaillerait mieux. C'est un choix éditorial, pas une correction technique :
-le template n'a pas été modifié sur ce point.
+Le H1 dit **« Le Rucher d'Elsa, apicultrice à Gordes »** — métier et commune
+dans la balise, ce qui compte pour le référencement local.
+
+Il tient en **un seul widget Titre**, sa seconde moitié en `<em>` doré
+italique. C'est exactement le procédé de `index.html`, dont le CSS ciblait
+`.hero h1 em`. Le couper en deux widgets aurait laissé la moitié de la phrase
+hors de la balise `<h1>` — le nom sans le métier ni le lieu. Le texte reste
+modifiable au clic, l'éditeur de titre acceptant l'italique depuis sa barre
+d'outils.
 
 ## Vérifier avant d'importer
 

@@ -137,6 +137,30 @@ def titre_mixte(debut, accent, px=60, tab=44, mob=33, align="left",
     return r
 
 
+def titre_h1(debut, accent, px=60, tab=44, mob=33):
+    """Le H1 : un seul widget portant la phrase entiere.
+
+    Le referencement lit la balise <h1> ; la couper en deux widgets
+    n'y laisserait que la moitie, soit le nom sans le metier ni le lieu.
+    L'italique dore de la seconde moitie passe donc par une balise <em>
+    dans le champ Titre — exactement ce que faisait index.html, dont le
+    CSS ciblait « .hero h1 em ». La regle vit dans le bloc d'effets.
+
+    Le texte reste modifiable au clic : l'editeur de titre d'Elementor
+    accepte l'italique depuis sa barre d'outils.
+    """
+    return w("heading", title="%s<br><em>%s</em>" % (debut, accent),
+             header_size="h1", align="left", title_color=CREME,
+             _css_classes="rdl-h1",
+             typography_typography="custom",
+             typography_font_family=SERIF,
+             typography_font_size=t(px), typography_font_size_tablet=t(tab),
+             typography_font_size_mobile=t(mob),
+             typography_font_weight="500",
+             typography_letter_spacing=t(-0.4),
+             typography_line_height=t(1.06, "em"))
+
+
 def surtitre(txt, align="left"):
     return w("heading", title=txt, header_size="div", align=align,
              title_color=MIEL,
@@ -347,7 +371,7 @@ def nav():
 def hero():
     gauche = colonne([
         surtitre("bienvenue"),
-        titre_mixte("Le Rucher d'Elsa", "Apicultrice et passionnée."),
+        titre_h1("Le Rucher d'Elsa,", "apicultrice à Gordes"),
         para("Vingt colonies conduites en transhumance entre garrigue et "
              "lavande. Récolte à la main, extraction à froid sous 40 °C, "
              "sans mélange de miellées.", px=17),
@@ -614,10 +638,19 @@ EFFETS = """<style>
   .rdl-hexcard{clip-path:none;border-radius:6px;}
 }
 
+/* Seconde moitie du H1 : italique doree, comme « .hero h1 em » dans
+   index.html. Le H1 reste une seule balise, donc une seule phrase pour
+   le referencement. */
+.rdl-h1 em{font-style:italic;color:%(miel)s;}
+
 /* Cadrage des photos : trois images de rapports differents doivent
-   remplir des blocs de meme hauteur. */
-.rdl-photo{display:flex;}
-.rdl-photo .elementor-widget-image,
+   remplir des blocs de meme hauteur.
+
+   Positionnement absolu et non height:100%% : un pourcentage de hauteur
+   ne se resout pas contre un parent qui n'a qu'un min-height, et l'image
+   garderait sa hauteur naturelle. */
+.rdl-photo{position:relative;overflow:hidden;}
+.rdl-photo > *{position:absolute;inset:0;margin:0;width:100%%;height:100%%;}
 .rdl-photo .elementor-widget-container,
 .rdl-photo figure,.rdl-photo a{width:100%%;height:100%%;margin:0;}
 .rdl-photo img{width:100%%;height:100%%;object-fit:cover;display:block;}
