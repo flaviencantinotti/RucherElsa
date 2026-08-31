@@ -224,6 +224,26 @@ def liste_liens(entrees, inline=False, couleur=CREME, survol=MIEL,
              icon_typography_line_height=t(1.8, "em"))
 
 
+HEXAGONE = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' "
+            "fill='none'><path d='M12 2L21 7V17L12 22L3 17V7L12 2Z' "
+            "stroke='" + MIEL + "' stroke-width='1.3'/></svg>")
+
+
+def hexagone(taille=30):
+    """La marque du logo, en data URI : rien a envoyer dans la mediatheque."""
+    from urllib.parse import quote
+    return conteneur([], content_width="full", _flex_size="none",
+                     width=t(taille), min_height=t(taille), padding=uni(0),
+                     background_background="classic",
+                     background_image={
+                         "url": "data:image/svg+xml;utf8," + quote(HEXAGONE,
+                                                                  safe=""),
+                         "id": "", "source": "url"},
+                     background_size="contain",
+                     background_position="center center",
+                     background_repeat="no-repeat")
+
+
 def lien_titre(txt, u, px=24, tab=22, mob=20):
     """Titre cliquable : le widget Titre porte nativement un champ Lien."""
     el = titre(txt, niveau="div", px=px, tab=tab, mob=mob, inter=1.2)
@@ -349,16 +369,40 @@ MENU = [("Le miel", "#miel"), ("Notre histoire", "#histoire"),
 
 
 def nav():
+    marque = rangee([
+        col_auto([hexagone()]),
+        col_auto([lien_titre("Le Rucher d'Elsa", "#hero")]),
+    ], g=12, align="center", retour="nowrap", _css_classes="rdl-logo",
+        flex_direction_mobile="row")
+
+    burger = col_auto([
+        w("button", text="☰", link=url("#"), align="right",
+          button_text_color=CREME, background_color="rgba(0,0,0,0)",
+          hover_color=MIEL, button_background_hover_color="rgba(0,0,0,0)",
+          border_border="solid", border_width=uni(1),
+          border_color="rgba(245,239,225,0.30)", border_radius=uni(2),
+          text_padding=esp(9, 13, 9, 13),
+          typography_typography="custom", typography_font_family=SANS,
+          typography_font_size=t(18)),
+    ], _css_classes="rdl-burger")
+
     return section([
+        # flex_direction_mobile en ligne : sur telephone la marque et le
+        # burger restent cote a cote, le menu se deplie sous eux.
         rangee([
-            colonne([lien_titre("Le Rucher d'Elsa", "#hero")],
-                    pct=30, tab=100, flex_align_items_tablet="center"),
-            colonne([liste_liens(MENU, inline=True)], pct=44, tab=100),
-            colonne([bouton_fantome("Nous écrire", "#contact", align="right")],
-                    pct=22, tab=100,
-                    flex_align_items_tablet="center"),
-        ], g=18, align="center"),
-    ], haut=22, bas=22, g=0,
+            colonne([marque], pct=32, tab=32, _css_classes="rdl-marque"),
+            # Le burger vient juste apres la marque : sur telephone, les
+            # deux se partagent la premiere ligne et le menu se deplie
+            # dessous. Place en dernier, il tombait sous le menu ouvert.
+            burger,
+            colonne([liste_liens(MENU, inline=True)], pct=44, tab=44,
+                    _css_classes="rdl-menu"),
+            colonne([bouton_fantome("Nous écrire", "#contact",
+                                    align="right")],
+                    pct=18, tab=18, _css_classes="rdl-cta"),
+        ], g=16, align="center", retour="wrap",
+            flex_direction_mobile="row", _css_classes="rdl-rangee"),
+    ], haut=18, bas=18, g=0,
         # Fond translucide et z-index sont natifs ; seuls le collage au
         # defilement et le flou passent par la feuille de style du bloc
         # d'effets, faute d'equivalent en Elementor gratuit.
@@ -638,6 +682,35 @@ EFFETS = """<style>
   .rdl-hexcard{clip-path:none;border-radius:6px;}
 }
 
+/* En-tete. Le soulignement dore au survol et le menu deroulant sur
+   telephone n'ont pas d'equivalent au panneau : ils reprennent les regles
+   « .nav-links a::after » et « .burger » de index.html. */
+.rdl-menu a{position:relative;padding-bottom:4px;text-decoration:none;}
+.rdl-menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;
+  height:1px;background:%(miel)s;transition:width .3s ease;}
+.rdl-menu a:hover::after{width:100%%;}
+.rdl-burger{display:none;}
+
+@media(max-width:767px){
+  .rdl-rangee{flex-direction:row!important;flex-wrap:wrap!important;
+    align-items:center!important;}
+  .rdl-marque{width:auto!important;flex:1 1 auto!important;}
+  .rdl-burger{display:block!important;}
+  .rdl-menu,.rdl-cta{display:none!important;width:100%%!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu,
+  .rdl-nav.rdl-ouvert .rdl-cta{display:flex!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu{padding-top:18px;}
+  .rdl-nav.rdl-ouvert .rdl-cta{padding-top:12px;
+    justify-content:flex-start!important;}
+  .rdl-cta .elementor-widget-button,
+  .rdl-cta .elementor-button-wrapper,
+  .rdl-cta .w-btnwrap{text-align:left!important;
+    justify-content:flex-start!important;}
+  .rdl-menu .elementor-icon-list-items,
+  .rdl-menu ul{flex-direction:column!important;align-items:flex-start!important;
+    gap:16px!important;}
+}
+
 /* Seconde moitie du H1 : italique doree, comme « .hero h1 em » dans
    index.html. Le H1 reste une seule balise, donc une seule phrase pour
    le referencement. */
@@ -700,14 +773,35 @@ EFFETS = """<style>
 (function(){
   /* Dans l'editeur, trois calques fixes couvriraient le canevas. */
   if(document.body.classList.contains('elementor-editor-active'))return;
-  if(!window.matchMedia('(hover:hover)').matches)return;
   if(window.__rdlTorche)return;
   window.__rdlTorche=1;
-  document.addEventListener('mousemove',function(e){
-    var r=document.documentElement.style;
-    r.setProperty('--rdl-x',e.clientX+'px');
-    r.setProperty('--rdl-y',e.clientY+'px');
-  });
+  /* L'ecoute est posee sur le conteneur, pas sur le lien : selon la
+     version, Elementor rend le bouton en <a> ou en <button>. */
+  var burger=document.querySelector('.rdl-burger'),
+      entete=document.querySelector('.rdl-nav');
+  if(burger&&entete){
+    var cible=burger.querySelector('a,button')||burger;
+    cible.setAttribute('aria-label','Ouvrir le menu');
+    burger.addEventListener('click',function(e){
+      e.preventDefault();
+      entete.classList.toggle('rdl-ouvert');
+    });
+    /* Refermer apres avoir choisi une destination. */
+    entete.querySelectorAll('.rdl-menu a').forEach(function(a){
+      a.addEventListener('click',function(){
+        entete.classList.remove('rdl-ouvert');
+      });
+    });
+  }
+  /* Le halo n'a de sens qu'avec un pointeur ; le burger, lui, sert
+     precisement la ou il n'y en a pas. */
+  if(window.matchMedia('(hover:hover)').matches){
+    document.addEventListener('mousemove',function(e){
+      var r=document.documentElement.style;
+      r.setProperty('--rdl-x',e.clientX+'px');
+      r.setProperty('--rdl-y',e.clientY+'px');
+    });
+  }
 })();
 </script>"""
 
