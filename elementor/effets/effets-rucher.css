@@ -1,0 +1,73 @@
+/* En-tete colle au defilement. position:sticky garde l'element dans le
+   flux : aucun decalage a compenser, contrairement a position:fixed. */
+.rdl-nav{position:sticky;top:0;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+
+/* Cartes de miel en hexagone, comme sur le site actuel. */
+.rdl-hexcard{
+  clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%);
+  transition:transform .4s ease,border-color .4s ease;}
+.rdl-hexcard:hover{transform:translateY(-6px);border-color:#DC9F2E!important;}
+@media(max-width:900px){
+  .rdl-hexcard{clip-path:none;border-radius:6px;}
+}
+
+/* En-tete. Le soulignement dore au survol et le menu deroulant sur
+   telephone n'ont pas d'equivalent au panneau : ils reprennent les regles
+   « .nav-links a::after » et « .burger » de index.html. */
+.rdl-menu a{position:relative;padding-bottom:4px;text-decoration:none;}
+.rdl-menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;
+  height:1px;background:#DC9F2E;transition:width .3s ease;}
+.rdl-menu a:hover::after{width:100%;}
+.rdl-burger{display:none;}
+
+@media(max-width:767px){
+  .rdl-rangee{flex-direction:row!important;flex-wrap:wrap!important;
+    align-items:center!important;}
+  .rdl-marque{width:auto!important;flex:1 1 auto!important;}
+  .rdl-burger{display:block!important;}
+  .rdl-menu,.rdl-cta{display:none!important;width:100%!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu,
+  .rdl-nav.rdl-ouvert .rdl-cta{display:flex!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu{padding-top:18px;}
+  .rdl-nav.rdl-ouvert .rdl-cta{padding-top:12px;
+    justify-content:flex-start!important;}
+  .rdl-cta .elementor-widget-button,
+  .rdl-cta .elementor-button-wrapper,
+  .rdl-cta .w-btnwrap{text-align:left!important;
+    justify-content:flex-start!important;}
+  .rdl-menu .elementor-icon-list-items,
+  .rdl-menu ul{flex-direction:column!important;align-items:flex-start!important;
+    gap:16px!important;}
+}
+
+/* Seconde moitie du H1 : italique doree, comme « .hero h1 em » dans
+   index.html. Le H1 reste une seule balise, donc une seule phrase pour
+   le referencement. */
+.rdl-h1 em{font-style:italic;color:#DC9F2E;}
+
+/* Cadrage des photos : trois images de rapports differents doivent
+   remplir des blocs de meme hauteur.
+
+   Positionnement absolu et non height:100% : un pourcentage de hauteur
+   ne se resout pas contre un parent qui n'a qu'un min-height, et l'image
+   garderait sa hauteur naturelle. */
+.rdl-photo{position:relative;overflow:hidden;}
+.rdl-photo > *{position:absolute;inset:0;margin:0;width:100%;height:100%;}
+.rdl-photo .elementor-widget-container,
+.rdl-photo figure,.rdl-photo a{width:100%;height:100%;margin:0;}
+.rdl-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+
+/* Les trois calques de la lampe torche. */
+#rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;
+  pointer-events:none;}
+#rdl-hexfield{z-index:1;opacity:.5;background-repeat:repeat;
+  background-size:52px 90px;background-image:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.35%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");}
+#rdl-vignette{z-index:1;background:radial-gradient(circle 460px at
+  var(--rdl-x,50%) var(--rdl-y,50%),transparent 0%,rgba(0,0,0,.35) 75%);}
+#rdl-glow{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
+  background:radial-gradient(circle 380px at var(--rdl-x,50%)
+  var(--rdl-y,50%),rgba(220,159,46,.45),rgba(220,159,46,.10) 40%,
+  transparent 70%);}
+/* Sans pointeur a suivre, le halo resterait fige au centre. */
+@media (hover:none){#rdl-glow,#rdl-vignette{display:none;}}

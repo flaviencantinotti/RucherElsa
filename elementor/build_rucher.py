@@ -230,15 +230,18 @@ HEXAGONE = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' "
 
 
 def hexagone(taille=30):
-    """La marque du logo, en data URI : rien a envoyer dans la mediatheque."""
-    from urllib.parse import quote
+    """La marque du logo, servie par URL comme les photos.
+
+    Le data URI ne survit pas a l'import : WordPress assainit les
+    attributs des modeles importes. Et un .svg servi par
+    raw.githubusercontent arrive en text/plain, que le navigateur refuse
+    comme image de fond. D'ou un PNG.
+    """
     return conteneur([], content_width="full", _flex_size="none",
                      width=t(taille), min_height=t(taille), padding=uni(0),
                      background_background="classic",
-                     background_image={
-                         "url": "data:image/svg+xml;utf8," + quote(HEXAGONE,
-                                                                  safe=""),
-                         "id": "", "source": "url"},
+                     background_image={"url": photo("hexagone.png"),
+                                       "id": "", "source": "url"},
                      background_size="contain",
                      background_position="center center",
                      background_repeat="no-repeat")
@@ -384,7 +387,11 @@ def nav():
           text_padding=esp(9, 13, 9, 13),
           typography_typography="custom", typography_font_family=SANS,
           typography_font_size=t(18)),
-    ], _css_classes="rdl-burger")
+    ], _css_classes="rdl-burger",
+        # Masquage natif d'Elementor, et non via le bloc d'effets : si
+        # celui-ci ne passe pas a l'import, un burger visible en grand
+        # ecran fait deborder la rangee et tout s'empile.
+        hide_desktop="hidden-desktop", hide_tablet="hidden-tablet")
 
     return section([
         # flex_direction_mobile en ligne : sur telephone la marque et le
@@ -883,6 +890,30 @@ if __name__ == "__main__":
         plus_gros = max(plus_gros, p)
         print("  sections/%-22s %6.1f Ko" % (nom + ".json", p / 1024))
     print("  plus gros fichier : %.1f Ko" % (plus_gros / 1024))
+
+    # Le bloc d'effets aussi en fichiers separes : WordPress assainit les
+    # balises <style> et <script> des modeles importes selon le role et la
+    # configuration du site. Ces deux fichiers passent par des voies qui,
+    # elles, ne sont jamais filtrees.
+    corps = EFFETS % {"miel": MIEL, "trame": trame_data_uri()}
+    css = corps.split("<style>")[1].split("</style>")[0].strip()
+    js = corps.split("<script>")[1].split("</script>")[0].strip()
+    calques = ("<div id=\"rdl-hexfield\"></div>\n"
+               "<div id=\"rdl-vignette\"></div>\n"
+               "<div id=\"rdl-glow\"></div>")
+    dossier_e = os.path.join(ici, "effets")
+    if not os.path.isdir(dossier_e):
+        os.makedirs(dossier_e)
+    for nom, contenu in [("effets-rucher.css", css),
+                         ("effets-rucher.js", js),
+                         ("calques-torche.html", calques)]:
+        with open(os.path.join(dossier_e, nom), "w", encoding="utf-8") as f:
+            f.write(contenu + "\n")
+    print("\nBloc d'effets, en fichiers separes")
+    for nom in ("effets-rucher.css", "effets-rucher.js",
+                "calques-torche.html"):
+        c = os.path.join(dossier_e, nom)
+        print("  effets/%-24s %5.1f Ko" % (nom, os.path.getsize(c) / 1024))
 
     print("\nEn option, hors page livree")
     for nom, fab in EN_OPTION:
