@@ -813,6 +813,10 @@ def effets():
                      padding=uni(0), _element_id="effets-rucher")
 
 
+# Les sections de la page livree. Les gabarits vierges n'en font pas
+# partie : ils servaient d'echafaudage et devaient etre supprimes a la
+# main apres import, ce qui est vite oublie. Ils restent disponibles a
+# part, dans sections/gabarits.json, pour qui veut les inserer.
 SECTIONS = [
     ("01-navigation", nav),
     ("02-hero", hero),
@@ -820,8 +824,11 @@ SECTIONS = [
     ("04-miel", miel),
     ("05-pollinisation", pollinisation),
     ("06-pied-de-page", pied),
-    ("07-gabarits", gabarits),
-    ("08-effets", effets),
+    ("07-effets", effets),
+]
+
+EN_OPTION = [
+    ("gabarits", gabarits),
 ]
 
 
@@ -876,3 +883,11 @@ if __name__ == "__main__":
         plus_gros = max(plus_gros, p)
         print("  sections/%-22s %6.1f Ko" % (nom + ".json", p / 1024))
     print("  plus gros fichier : %.1f Ko" % (plus_gros / 1024))
+
+    print("\nEn option, hors page livree")
+    for nom, fab in EN_OPTION:
+        _n[0] = 0
+        d = envelopper([nettoyer(fab())], "Rucher d'Elsa — %s" % nom,
+                       "container")
+        p = ecrire(d, os.path.join(dossier, nom + ".json"))
+        print("  sections/%-22s %6.1f Ko" % (nom + ".json", p / 1024))

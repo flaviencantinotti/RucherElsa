@@ -18,12 +18,10 @@
 - Importer `rucher-accueil.json` — la ligne de type **Page**.
 - Ouvrir la page, supprimer son contenu, puis icône dossier → *Mes modèles*.
 
-**3. Deux réglages que le fichier ne pose pas.**
-- *Réglages de la page → Mise en page* → **Elementor Canvas**. Le template
-  fournit sa propre navigation et son propre pied de page ; sans ce réglage,
-  ceux du thème s'ajouteraient par-dessus.
-- Supprimer la section **« Gabarits — à supprimer avant mise en ligne »**
-  (7ᵉ conteneur) une fois le modèle appliqué.
+**3. Le seul réglage que le fichier ne pose pas.**
+*Réglages de la page → Mise en page* → **Elementor Canvas**. Le template
+fournit sa propre navigation et son propre pied de page ; sans ce réglage,
+ceux du thème s'ajouteraient par-dessus.
 
 ## À faire sur GitHub
 

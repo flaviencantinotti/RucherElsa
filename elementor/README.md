@@ -61,6 +61,16 @@ python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
 Sans passer par le script, chaque conteneur se modifie au panneau :
 *Style → Arrière-plan → Image*.
 
+## Les gabarits vierges
+
+Ils ne sont plus dans la page livrée : c'était un échafaudage qu'il fallait
+penser à supprimer après l'import, ce qui s'oublie vite.
+
+Ils restent disponibles dans `sections/gabarits.json` — quatre rangées vides
+en une, deux, trois et quatre colonnes, largeurs et responsive déjà réglés.
+À importer et insérer si vous voulez composer de nouvelles sections à la
+souris, puis à retirer avant publication.
+
 ## Le bloc d'effets
 
 Trois choses du site actuel n'ont pas d'équivalent dans le panneau Elementor :
