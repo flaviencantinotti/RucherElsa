@@ -127,7 +127,10 @@ def verifier_rangee(el, chemin):
             if pct <= 0:
                 continue
             gap_pct_unit = gap_px / utile * 100
-            voulu = int(round(100.0 / pct))
+            # Combien tiendraient sans gouttiere, plafonne au nombre reel
+            # de colonnes : trois colonnes a 28 % tiennent sur une ligne,
+            # meme si la largeur en autoriserait une quatrieme.
+            voulu = min(comptees, int(100.0 / pct))
             tiennent = int((100 + gap_pct_unit) // (pct + gap_pct_unit))
             if voulu > 1 and tiennent < voulu:
                 signaler(

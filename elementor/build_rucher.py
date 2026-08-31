@@ -113,30 +113,6 @@ def titre(txt, niveau="h2", px=44, tab=34, mob=27, couleur=CREME,
              typography_line_height=t(inter, "em"))
 
 
-def titre_mixte(debut, accent, px=60, tab=44, mob=33, align="left",
-                niveau="h1"):
-    """Titre en deux morceaux : romain puis italique doré.
-
-    Deux widgets Titre plutot qu'une balise inline : chaque moitie reste
-    editable au clic, et Elementor charge reellement les deux graisses.
-    """
-    # Pas de _flex_size "none" ici : les deux moities doivent pouvoir
-    # retrecir, sinon un titre plus large que sa colonne deborde sur le
-    # voisin au lieu de passer a la ligne.
-    r = rangee([
-        conteneur([titre(debut, niveau=niveau, px=px, tab=tab, mob=mob,
-                         align=align, inter=1.06)],
-                  content_width="full", padding=uni(0)),
-        conteneur([titre(accent, niveau="div", px=px, tab=tab, mob=mob,
-                         couleur=MIEL, align=align, italique="italic",
-                         inter=1.06)],
-                  content_width="full", padding=uni(0)),
-    ], g=14, retour="wrap", align="baseline")
-    r["settings"]["flex_justify_content"] = (
-        "center" if align == "center" else "flex-start")
-    return r
-
-
 def titre_h1(debut, accent, px=60, tab=44, mob=33):
     """Le H1 : un seul widget portant la phrase entiere.
 
@@ -224,26 +200,29 @@ def liste_liens(entrees, inline=False, couleur=CREME, survol=MIEL,
              icon_typography_line_height=t(1.8, "em"))
 
 
-HEXAGONE = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' "
-            "fill='none'><path d='M12 2L21 7V17L12 22L3 17V7L12 2Z' "
-            "stroke='" + MIEL + "' stroke-width='1.3'/></svg>")
+def marque_logo():
+    """Le logo : un conteneur, un widget, le losange en image de fond.
 
+    L'empiler en deux colonnes imposait de dimensionner chaque colonne
+    sur son contenu, ce qu'Elementor ne fait pas : un conteneur enfant
+    sans largeur vaut 100 %. Le losange passe donc en arriere-plan, cale
+    a gauche, et le titre est decale par une marge interieure.
 
-def hexagone(taille=30):
-    """La marque du logo, servie par URL comme les photos.
-
-    Le data URI ne survit pas a l'import : WordPress assainit les
-    attributs des modeles importes. Et un .svg servi par
+    Le PNG plutot qu'un data URI ou un SVG : le data URI ne survit pas a
+    l'assainissement des modeles importes, et un .svg servi par
     raw.githubusercontent arrive en text/plain, que le navigateur refuse
-    comme image de fond. D'ou un PNG.
+    comme image de fond.
     """
-    return conteneur([], content_width="full", _flex_size="none",
-                     width=t(taille), min_height=t(taille), padding=uni(0),
+    return conteneur([lien_titre("Le Rucher d'Elsa", "#hero")],
+                     content_width="full", width=t(100, "%"),
+                     _css_classes="rdl-logo",
+                     min_height=t(34), padding=esp(0, 0, 0, 46),
+                     flex_justify_content="center",
                      background_background="classic",
                      background_image={"url": photo("hexagone.png"),
                                        "id": "", "source": "url"},
                      background_size="contain",
-                     background_position="center center",
+                     background_position="left center",
                      background_repeat="no-repeat")
 
 
@@ -341,11 +320,11 @@ def colonne(enfants, pct=48, tab=None, g=16, **extra):
     return conteneur(enfants, **r)
 
 
-def col_auto(enfants, g=10, **extra):
-    r = {"content_width": "full", "flex_direction": "column",
-         "flex_gap": gap(g), "padding": uni(0), "_flex_size": "none"}
-    r.update(extra)
-    return conteneur(enfants, **r)
+# col_auto a ete retire : il posait _flex_size="none", valeur qu'Elementor
+# ne connait pas — ses options sont grow, shrink et custom. Sans regle
+# produite, le conteneur enfant retombait sur son defaut, 100 % de large,
+# et tout ce qui devait se dimensionner sur son contenu occupait la
+# largeur entiere. Les widgets vont desormais directement dans la rangee.
 
 
 def carte(enfants, pct=31, tab=47, interieur=30, fond=NOIR2, rayon=6,
@@ -372,26 +351,21 @@ MENU = [("Le miel", "#miel"), ("Notre histoire", "#histoire"),
 
 
 def nav():
-    marque = rangee([
-        col_auto([hexagone()]),
-        col_auto([lien_titre("Le Rucher d'Elsa", "#hero")]),
-    ], g=12, align="center", retour="nowrap", _css_classes="rdl-logo",
-        flex_direction_mobile="row")
+    marque = marque_logo()
 
-    burger = col_auto([
-        w("button", text="☰", link=url("#"), align="right",
-          button_text_color=CREME, background_color="rgba(0,0,0,0)",
-          hover_color=MIEL, button_background_hover_color="rgba(0,0,0,0)",
-          border_border="solid", border_width=uni(1),
-          border_color="rgba(245,239,225,0.30)", border_radius=uni(2),
-          text_padding=esp(9, 13, 9, 13),
-          typography_typography="custom", typography_font_family=SANS,
-          typography_font_size=t(18)),
-    ], _css_classes="rdl-burger",
-        # Masquage natif d'Elementor, et non via le bloc d'effets : si
-        # celui-ci ne passe pas a l'import, un burger visible en grand
-        # ecran fait deborder la rangee et tout s'empile.
-        hide_desktop="hidden-desktop", hide_tablet="hidden-tablet")
+    # Le widget porte lui-meme sa classe et son masquage : un conteneur
+    # d'enveloppe vaudrait 100 % de large et pousserait le reste.
+    burger = w("button", text="☰", link=url("#"), align="right",
+               _css_classes="rdl-burger",
+               hide_desktop="hidden-desktop", hide_tablet="hidden-tablet",
+               button_text_color=CREME, background_color="rgba(0,0,0,0)",
+               hover_color=MIEL,
+               button_background_hover_color="rgba(0,0,0,0)",
+               border_border="solid", border_width=uni(1),
+               border_color="rgba(245,239,225,0.30)", border_radius=uni(2),
+               text_padding=esp(9, 13, 9, 13),
+               typography_typography="custom", typography_font_family=SANS,
+               typography_font_size=t(18))
 
     return section([
         # flex_direction_mobile en ligne : sur telephone la marque et le
@@ -427,10 +401,10 @@ def hero():
              "lavande. Récolte à la main, extraction à froid sous 40 °C, "
              "sans mélange de miellées.", px=17),
         espace(8),
-        rangee([
-            col_auto([bouton("Découvrir le miel", "#miel")]),
-            col_auto([bouton_fantome("Notre histoire", "#histoire")]),
-        ], g=14),
+        # Widgets directement dans la rangee : un conteneur d'enveloppe
+        # vaudrait 100 % et les boutons s'empileraient.
+        rangee([bouton("Découvrir le miel", "#miel"),
+                bouton_fantome("Notre histoire", "#histoire")], g=14),
     ], pct=54, tab=100, g=20)
     droite = colonne([image_fond("abeille1.jpg", 600,
                                  alt="Abeille butinant sur des épis secs")],
@@ -441,12 +415,12 @@ def hero():
 
 def histoire():
     faits = rangee([
-        col_auto([titre(v, niveau="div", px=30, tab=27, mob=25, couleur=MIEL,
-                        inter=1.1),
-                  para("<p>%s</p>" % s, px=13)], g=2)
+        colonne([titre(v, niveau="div", px=30, tab=27, mob=25, couleur=MIEL,
+                       inter=1.1),
+                 para("<p>%s</p>" % s, px=13)], pct=28, tab=28, g=2)
         for v, s in [("20", "ruches en activité"), ("4", "terroirs butinés"),
                      ("12", "ans de pratique")]
-    ], g=40)
+    ], g=24)
     return section([rangee([
         colonne([image_fond("abeille2.jpg", 580,
                             alt="Abeille domestique en gros plan")],
@@ -574,9 +548,8 @@ def pied():
              "84220 Gordes, Vaucluse — Provence-Alpes-Côte d'Azur.",
              px=16, align="center"),
         espace(6),
-        rangee([col_auto([bouton("Nous écrire",
-                                 "mailto:contact@rucherdelsa.fr")])],
-               g=0, justif="center"),
+        rangee([bouton("Nous écrire", "mailto:contact@rucherdelsa.fr",
+                       align="center")], g=0, justif="center"),
     ], pct=60, tab=90, g=16, animation="fadeInUp")
 
     col_a = colonne([

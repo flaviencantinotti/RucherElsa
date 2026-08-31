@@ -83,14 +83,23 @@ def regles(s, conteneur, partiel=False):
         g = px(s.get("flex_gap"))
         if g:
             d["gap"] = g
-        if s.get("_flex_size") == "none":
-            d["flex"] = "0 0 auto"
+        # Elementor ne connait que grow / shrink / custom pour _flex_size.
+        # Toute autre valeur ne produit aucune regle, et un conteneur
+        # enfant vaut alors 100 % — c'est son defaut. L'apercu doit
+        # modeliser ce defaut, sinon il montre une mise en page que
+        # WordPress ne produira jamais.
+        if s.get("_flex_size") in ("grow", "shrink", "custom"):
+            d["flex"] = {"grow": "1 1 auto", "shrink": "0 1 auto",
+                         "custom": "0 0 auto"}[s["_flex_size"]]
         if s.get("overflow"):
             d["overflow"] = s["overflow"]
 
         largeur = px(s.get("width"))
         if largeur:
             d["width"] = largeur
+        elif not partiel and s.get("content_width") == "full":
+            # Defaut d'Elementor pour un conteneur enfant sans largeur.
+            d["width"] = "100%"
         elif not partiel and s.get("content_width") == "boxed":
             # Elementor : fond pleine largeur, contenu centre.
             d["width"] = "100%"
