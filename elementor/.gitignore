@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 apercus/
+
+# Archives regenerables depuis les JSON
+*.zip
