@@ -323,6 +323,11 @@ def nav():
                     flex_align_items_tablet="center"),
         ], g=18, align="center"),
     ], haut=22, bas=22, g=0,
+        # Fond translucide et z-index sont natifs ; seuls le collage au
+        # defilement et le flou passent par la feuille de style du bloc
+        # d'effets, faute d'equivalent en Elementor gratuit.
+        _css_classes="rdl-nav", z_index=50,
+        background_color="rgba(10,9,8,0.72)",
         border_border="solid", border_width=esp(0, 0, 1, 0),
         border_color=TRAIT)
 
@@ -409,6 +414,7 @@ def miel():
         # Le site actuel pose la photo en fond, assombrie par un degrade.
         # On garde le fond sombre ; l'image se choisit dans le panneau.
         c["settings"].update({
+            "_css_classes": "rdl-hexcard",
             "background_background": "gradient",
             "background_color": NOIR2,
             "background_color_b": "#1d1710",
@@ -542,6 +548,86 @@ def gabarits():
     ], fond=NOIR2, haut=70, bas=70)
 
 
+
+# --- Bloc d'effets ----------------------------------------------------------
+# Tout ce qu'Elementor gratuit ne sait pas exprimer au panneau, rassemble
+# en un unique widget HTML pose en fin de page : le decoupage hexagonal
+# des cartes, le collage de l'en-tete au defilement, et les trois calques
+# de la lampe torche. Il n'affiche aucun texte et ne se rouvre jamais.
+#
+# La trame hexagonale est embarquee en data URI : rien a envoyer dans la
+# mediatheque, et WordPress n'a pas a etre convaincu d'accepter le SVG.
+
+TRAME = (
+    "<svg xmlns='http://www.w3.org/2000/svg' width='52' height='90'>"
+    "<g fill='none' stroke='rgba(220,159,46,0.35)' stroke-width='1'>"
+    "<polygon points='26,2 47,15 47,42 26,55 5,42 5,15'/>"
+    "<polygon points='0,47 21,60 21,87 0,100 -21,87 -21,60'/>"
+    "<polygon points='52,47 73,60 73,87 52,100 31,87 31,60'/>"
+    "</g></svg>"
+)
+
+
+def trame_data_uri():
+    from urllib.parse import quote
+    return "data:image/svg+xml;utf8," + quote(TRAME, safe="")
+
+
+EFFETS = """<style>
+/* En-tete colle au defilement. position:sticky garde l'element dans le
+   flux : aucun decalage a compenser, contrairement a position:fixed. */
+.rdl-nav{position:sticky;top:0;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+
+/* Cartes de miel en hexagone, comme sur le site actuel. */
+.rdl-hexcard{
+  clip-path:polygon(8%% 0,92%% 0,100%% 50%%,92%% 100%%,8%% 100%%,0 50%%);
+  transition:transform .4s ease,border-color .4s ease;}
+.rdl-hexcard:hover{transform:translateY(-6px);border-color:%(miel)s!important;}
+@media(max-width:900px){
+  .rdl-hexcard{clip-path:none;border-radius:6px;}
+}
+
+/* Les trois calques de la lampe torche. */
+#rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;
+  pointer-events:none;}
+#rdl-hexfield{z-index:1;opacity:.5;background-repeat:repeat;
+  background-size:52px 90px;background-image:url("%(trame)s");}
+#rdl-vignette{z-index:1;background:radial-gradient(circle 460px at
+  var(--rdl-x,50%%) var(--rdl-y,50%%),transparent 0%%,rgba(0,0,0,.35) 75%%);}
+#rdl-glow{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
+  background:radial-gradient(circle 380px at var(--rdl-x,50%%)
+  var(--rdl-y,50%%),rgba(220,159,46,.45),rgba(220,159,46,.10) 40%%,
+  transparent 70%%);}
+/* Sans pointeur a suivre, le halo resterait fige au centre. */
+@media (hover:none){#rdl-glow,#rdl-vignette{display:none;}}
+</style>
+<div id="rdl-hexfield"></div>
+<div id="rdl-vignette"></div>
+<div id="rdl-glow"></div>
+<script>
+(function(){
+  /* Dans l'editeur, trois calques fixes couvriraient le canevas. */
+  if(document.body.classList.contains('elementor-editor-active'))return;
+  if(!window.matchMedia('(hover:hover)').matches)return;
+  if(window.__rdlTorche)return;
+  window.__rdlTorche=1;
+  document.addEventListener('mousemove',function(e){
+    var r=document.documentElement.style;
+    r.setProperty('--rdl-x',e.clientX+'px');
+    r.setProperty('--rdl-y',e.clientY+'px');
+  });
+})();
+</script>"""
+
+
+def effets():
+    return conteneur([w("html", html=EFFETS % {"miel": MIEL,
+                                               "trame": trame_data_uri()})],
+                     content_width="full", width=t(100, "%"),
+                     padding=uni(0), _element_id="effets-rucher")
+
+
 SECTIONS = [
     ("01-navigation", nav),
     ("02-hero", hero),
@@ -550,6 +636,7 @@ SECTIONS = [
     ("05-pollinisation", pollinisation),
     ("06-pied-de-page", pied),
     ("07-gabarits", gabarits),
+    ("08-effets", effets),
 ]
 
 

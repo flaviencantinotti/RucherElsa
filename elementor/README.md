@@ -40,25 +40,42 @@ d'arrière-plan* noire à environ 60 % d'opacité.
 Les fichiers d'origine sont à la racine du dépôt : `abeille1.jpg` à
 `abeille3.jpg`, `miel-fleurs.png`, `miel-garrigue.png`, `miel-lavande.png`.
 
-## Ce qui n'a pas pu être repris à l'identique
+## Le bloc d'effets
 
-Trois effets du site actuel reposent sur du CSS ou du JavaScript qu'Elementor
-gratuit ne sait pas produire sans widget de code.
+Trois choses du site actuel n'ont pas d'équivalent dans le panneau Elementor :
+le découpage hexagonal des cartes de miel, l'en-tête qui suit le défilement,
+et la lampe torche — trame hexagonale, halo qui suit la souris, vignette.
 
-**Les cartes hexagonales.** Le `clip-path` qui découpe les trois cartes de
-miel en hexagones n'a pas d'équivalent dans le panneau. Les cartes sont des
-rectangles à coins légèrement arrondis, avec le même fond et la même bordure.
+Elles sont toutes restituées, rassemblées dans **un unique widget HTML** placé
+en dernier conteneur de la page, sous l'identifiant `effets-rucher`.
 
-**La lampe torche.** Le halo doré qui suit la souris, la trame hexagonale de
-fond et la vignette sont trois calques animés en JavaScript. Absents de la
-page principale, mais récupérables : voir `effet-torche/`. La trame et la
-vignette se refont entièrement dans le panneau, sans code ; seul le suivi du
-pointeur demande quatre lignes de JavaScript, isolées dans un widget dédié.
+C'est un choix assumé, et d'une autre nature que du HTML dans les conteneurs
+de contenu : ce bloc n'affiche aucun texte, ne se rouvre jamais, et c'est
+exactement ce que fait n'importe quel intégrateur pour un effet global. Les
+conteneurs de contenu, eux, restent en widgets natifs de bout en bout.
 
-**L'en-tête fixe.** Le *sticky* est une fonction Elementor Pro. La barre reste
-en haut de page au lieu de suivre le défilement.
+Le reste passe par des réglages natifs : la classe `rdl-nav` et la classe
+`rdl-hexcard` sont posées depuis *Avancé → Classes CSS*, le fond translucide
+de l'en-tête et son z-index depuis le panneau.
 
-Les apparitions au défilement, elles, sont conservées : elles passent par
+**La trame hexagonale est embarquée en data URI** dans la feuille de style :
+rien à envoyer dans la médiathèque, et WordPress n'a pas à être convaincu
+d'accepter les fichiers SVG.
+
+**Deux gardes** ont été ajoutées au code d'origine. Le script ne s'exécute pas
+dans l'éditeur Elementor — sans quoi trois calques en `position:fixed`
+couvriraient le canevas et empêcheraient de cliquer sur les conteneurs. Et le
+halo est masqué sur écran tactile, où il n'y a pas de pointeur à suivre et où
+il resterait figé au centre.
+
+**L'en-tête utilise `position:sticky`** plutôt que le `position:fixed` du site
+d'origine. Sticky garde l'élément dans le flux : aucun décalage à compenser en
+haut de page, et cela évite la fonction *Sticky* d'Elementor, réservée à Pro.
+
+Si vous préférez une page sans une seule ligne de code, supprimez ce dernier
+conteneur : vous perdez les trois effets, tout le reste tient debout.
+
+Les apparitions au défilement, elles, sont natives : elles passent par
 l'animation d'entrée d'Elementor, disponible en version gratuite.
 
 ## Vérifier avant d'importer

@@ -225,6 +225,10 @@ def rendre_widget(el, cl):
             cl, px(s.get("space")) or "20px")
     if wt == "image":
         return ("<div class='%s w-img'>emplacement image</div>" % cl)
+    if wt == "html":
+        # Rendu tel quel : c'est le seul moyen de verifier que le bloc
+        # d'effets produit bien ce qu'on attend.
+        return s.get("html", "")
     if wt == "google_maps":
         return ("<div class='%s w-map'>plan Google Maps — %s</div>"
                 % (cl, s.get("address", "")))
@@ -239,6 +243,9 @@ def rendre(el, css, css_tab, css_mob):
     if not conteneur:
         return rendre_widget(el, cl)
 
+    sup = el["settings"].get("_css_classes")
+    if sup:
+        cl = cl + " " + sup
     dedans = "".join(rendre(e, css, css_tab, css_mob) for e in el["elements"])
     if el["settings"].get("content_width") == "boxed":
         largeur = px(el["settings"].get("boxed_width")) or "1140px"
