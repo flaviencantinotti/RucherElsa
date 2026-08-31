@@ -35,6 +35,19 @@ SANS = "Manrope"        # textes
 LARGEUR = 1180
 UTILE = 1132.0
 
+# Base d'URL des photos. Par defaut le depot public, ce qui rend le
+# template utilisable des l'import. Pour la mise en ligne, mieux vaut
+# pointer la mediatheque WordPress : les images y sont servies avec les
+# bons en-tetes de cache et les tailles derivees.
+#   python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
+BASE_IMAGES = ("https://raw.githubusercontent.com/"
+               "flaviencantinotti-ship-it/RucherElsa/"
+               "elementor-template/elementor/images/")
+
+
+def photo(nom):
+    return BASE_IMAGES + nom
+
 _n = [0]
 
 
@@ -211,31 +224,26 @@ def espace(px=30):
     return w("spacer", space=t(px))
 
 
-def image_fond(fichier, ratio=340, rayon=6, bordure=TRAIT_MIEL, libelle=""):
-    """Emplacement photo : fond en degre sombre, image a poser ensuite.
+def image_fond(fichier, ratio=340, rayon=6, bordure=TRAIT_MIEL, libelle="",
+               voile=0.25):
+    """Bloc photo : l'image en arriere-plan, sous un leger voile sombre.
 
-    Le site actuel superpose un degrade noir sur la photo ; on reproduit
-    le degrade, l'image se choisit dans le panneau Arriere-plan.
+    Reprend le procede du site actuel, ou chaque visuel est assombri pour
+    que le texte doré garde son contraste. L'image reste remplacable au
+    panneau : Style > Arriere-plan > Image.
     """
-    enfants = []
-    if libelle:
-        enfants.append(w("heading", title=libelle, header_size="div",
-                         align="center", title_color="rgba(245,239,225,0.42)",
-                         typography_typography="custom",
-                         typography_font_family=SANS,
-                         typography_font_size=t(13)))
-    return conteneur(enfants, content_width="full", width=t(100, "%"),
+    return conteneur([], content_width="full", width=t(100, "%"),
                      min_height=t(ratio),
-                     flex_justify_content="center",
-                     flex_align_items="center",
-                     background_background="gradient",
-                     background_color=NOIR2,
-                     background_color_b="#241c10",
-                     background_gradient_type="linear",
-                     background_gradient_angle=t(160, "deg"),
+                     background_background="classic",
+                     background_image={"url": photo(fichier), "id": "",
+                                       "source": "url"},
+                     background_size="cover",
+                     background_position="center center",
+                     background_repeat="no-repeat",
+                     background_overlay_background="classic",
+                     background_overlay_color="rgba(10,9,8,%s)" % voile,
                      border_border="solid", border_width=uni(1),
-                     border_color=bordure, border_radius=uni(rayon),
-                     padding=uni(20))
+                     border_color=bordure, border_radius=uni(rayon))
 
 
 # --- Assemblages ------------------------------------------------------------
@@ -386,21 +394,21 @@ MIELS = [
     ("01 — Avril", "Toutes fleurs de printemps",
      "La première miellée de l'année, butinée avant la montée des chaleurs. "
      "Miel doux et clair, qui cristallise vite en pot.",
-     "8,90 € · pot de 250g", "miel-fleurs.png"),
+     "8,90 € · pot de 250g", "miel-fleurs.jpg"),
     ("02 — Juin", "Miel de garrigue",
      "Thym, romarin et ciste des collines sèches. Ambré, corsé, à la pointe "
      "résineuse typique de la garrigue.",
-     "9,90 € · pot de 250g", "miel-garrigue.png"),
+     "9,90 € · pot de 250g", "miel-garrigue.jpg"),
     ("03 — Juillet", "Miel de lavande",
      "Butiné sur les plateaux de Haute-Provence entre fin juin et début "
      "août. Texture fine, parfum floral persistant.",
-     "9,50 € · pot de 250g", "miel-lavande.png"),
+     "9,50 € · pot de 250g", "miel-lavande.jpg"),
 ]
 
 
 def miel():
     cartes = []
-    for num, nom, desc, prix, photo in MIELS:
+    for num, nom, desc, prix, photo_fichier in MIELS:
         c = carte([
             w("heading", title=num, header_size="div", align="left",
               title_color=ROUILLE,
@@ -413,13 +421,21 @@ def miel():
         ], interieur=32)
         # Le site actuel pose la photo en fond, assombrie par un degrade.
         # On garde le fond sombre ; l'image se choisit dans le panneau.
+        # Photo en fond, sous le degrade noir du site d'origine :
+        # linear-gradient(rgba(10,9,8,.55), rgba(10,9,8,.9)) sur l'image.
         c["settings"].update({
             "_css_classes": "rdl-hexcard",
-            "background_background": "gradient",
-            "background_color": NOIR2,
-            "background_color_b": "#1d1710",
-            "background_gradient_type": "linear",
-            "background_gradient_angle": t(165, "deg"),
+            "background_background": "classic",
+            "background_image": {"url": photo(photo_fichier), "id": "",
+                                 "source": "url"},
+            "background_size": "cover",
+            "background_position": "center center",
+            "background_repeat": "no-repeat",
+            "background_overlay_background": "gradient",
+            "background_overlay_color": "rgba(10,9,8,0.55)",
+            "background_overlay_color_b": "rgba(10,9,8,0.90)",
+            "background_overlay_gradient_type": "linear",
+            "background_overlay_gradient_angle": t(180, "deg"),
         })
         cartes.append(c)
     return section([
@@ -663,6 +679,12 @@ def ecrire(doc, chemin):
 
 
 if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:
+        BASE_IMAGES = sys.argv[1]
+        if not BASE_IMAGES.endswith("/"):
+            BASE_IMAGES += "/"
+        print("Base des images : %s\n" % BASE_IMAGES)
     ici = os.path.dirname(os.path.abspath(__file__))
 
     _n[0] = 0

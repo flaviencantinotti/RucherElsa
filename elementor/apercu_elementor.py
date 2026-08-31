@@ -106,7 +106,23 @@ def regles(s, conteneur, partiel=False):
     if m:
         d["margin"] = m
 
-    if s.get("background_background") == "classic" and s.get("background_color"):
+    # Image de fond, avec sa superposition eventuelle : c'est ainsi que
+    # le site pose ses photos, pas via le widget Image.
+    img = (s.get("background_image") or {}).get("url")
+    voile = s.get("background_overlay_color")
+    voile_b = s.get("background_overlay_color_b")
+    if img:
+        couches = []
+        if voile and voile_b:
+            couches.append("linear-gradient(%s, %s)" % (voile, voile_b))
+        elif voile:
+            couches.append("linear-gradient(%s, %s)" % (voile, voile))
+        couches.append("url('%s')" % img)
+        d["background-image"] = ", ".join(couches)
+        d["background-size"] = s.get("background_size", "cover")
+        d["background-position"] = s.get("background_position", "center center")
+        d["background-repeat"] = "no-repeat"
+    elif s.get("background_background") == "classic" and s.get("background_color"):
         d["background"] = s["background_color"]
     elif not conteneur and s.get("background_color"):
         # Le bouton porte sa couleur de fond sans drapeau background_background.
@@ -279,6 +295,16 @@ img{max-width:100%;}
 """
 
 
+def polices_utilisees(el, vues):
+    """Releve les familles declarees, pour ne demander que celles-la."""
+    for cle, val in el["settings"].items():
+        if cle.endswith("font_family") and isinstance(val, str) and val:
+            vues.add(val)
+    for e in el.get("elements", []):
+        polices_utilisees(e, vues)
+    return vues
+
+
 def construire(chemin_json):
     doc = json.load(open(chemin_json, encoding="utf-8"))
     css, css_tab, css_mob = [], [], []
@@ -288,16 +314,24 @@ def construire(chemin_json):
     feuille += "@media(max-width:%dpx){%s}" % (TABLETTE, "".join(css_tab))
     feuille += "@media(max-width:%dpx){%s}" % (MOBILE, "".join(css_mob))
 
+    familles = set()
+    for sec in doc["content"]:
+        polices_utilisees(sec, familles)
+    lien = ""
+    if familles:
+        params = "&".join(
+            "family=%s:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400"
+            % f.replace(" ", "+") for f in sorted(familles))
+        lien = ("<link rel='preconnect' href='https://fonts.gstatic.com' "
+                "crossorigin><link rel='stylesheet' "
+                "href='https://fonts.googleapis.com/css2?%s&display=swap'>"
+                % params)
+
     return ("<!DOCTYPE html><html lang='fr'><head><meta charset='utf-8'>"
             "<meta name='viewport' content='width=device-width,initial-scale=1'>"
-            "<title>%s</title>"
-            "<link rel='preconnect' href='https://fonts.googleapis.com'>"
-            "<link href='https://fonts.googleapis.com/css2?"
-            "family=Instrument+Serif:ital@0;1&"
-            "family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap' "
-            "rel='stylesheet'>"
+            "<title>%s</title>%s"
             "<style>%s</style></head><body>%s</body></html>"
-            % (doc.get("title", "Aperçu"), feuille, corps))
+            % (doc.get("title", "Aperçu"), lien, feuille, corps))
 
 
 if __name__ == "__main__":

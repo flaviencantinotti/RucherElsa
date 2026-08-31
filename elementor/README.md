@@ -31,14 +31,35 @@ Vérifiez d'abord deux réglages :
 
 ## Les photos
 
-Les six emplacements sont des conteneurs à fond dégradé sombre. Pour poser une
-photo : sélectionner le conteneur → *Style → Arrière-plan* → passer de
-*Dégradé* à *Classique* → choisir l'image. Le site actuel superposait un
-dégradé noir sur chaque photo ; pour le reproduire, ajoutez une *Superposition
-d'arrière-plan* noire à environ 60 % d'opacité.
+Les six photos du site sont déjà en place : les trois abeilles dans le hero,
+l'histoire et la pollinisation, les trois pots dans les cartes de miel — sous
+le voile sombre du site d'origine, pour que le doré garde son contraste.
 
-Les fichiers d'origine sont à la racine du dépôt : `abeille1.jpg` à
-`abeille3.jpg`, `miel-fleurs.png`, `miel-garrigue.png`, `miel-lavande.png`.
+Elles sont servies depuis `elementor/images/`, via l'URL publique du dépôt.
+Le template s'affiche donc correctement dès l'import, sans rien envoyer dans
+la médiathèque.
+
+**Elles ont été optimisées** : 9,8 Mo à l'origine, 1,3 Mo maintenant, soit
+87 % de moins. Les PNG de miel pesaient 2,3 Mo chacun pour un affichage à
+350 px de large ; ils sont passés en JPEG à 1400 px. À 9,8 Mo, la page aurait
+mis plusieurs secondes à s'afficher sur mobile.
+
+### Pour la mise en ligne
+
+Servir les images depuis GitHub convient à un aperçu, pas à un site en
+production : pas de cache maîtrisé, pas de tailles dérivées, et tout casse si
+le dépôt passe en privé.
+
+Envoyez les six fichiers de `elementor/images/` dans la médiathèque
+WordPress, puis régénérez le template avec l'adresse de votre dossier
+d'envois :
+
+```bash
+python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
+```
+
+Sans passer par le script, chaque conteneur se modifie au panneau :
+*Style → Arrière-plan → Image*.
 
 ## Le bloc d'effets
 
