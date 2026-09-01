@@ -25,9 +25,11 @@ MIEL = "#DC9F2E"        # dore : accents, surtitres, boutons
 MIEL_CLAIR = "#F0C878"  # dore clair : survols
 CREME = "#F5EFE1"       # texte principal
 CREME_DOUX = "#A89F8C"  # texte secondaire
-ROUILLE = "#B87A3D"     # numeros de carte. Eclairci : le #7A4B23
-                        # d'origine tombait a 2,6:1 sur le fond des
-                        # cartes, sous le seuil WCAG AA de 4,5:1.
+ROUILLE = "#D0925D"     # numeros de carte. Le #7A4B23 d'origine tombait
+                        # a 1,2:1 sur le fond reel des cartes — une photo
+                        # sous un voile trop leger, pas du noir plein.
+                        # Meme teinte et meme saturation, clarte montee a
+                        # 59 % : 4,6:1, au-dessus du seuil WCAG AA.
 TRAIT = "rgba(245,239,225,0.10)"
 TRAIT_MIEL = "rgba(220,159,46,0.25)"
 
@@ -493,8 +495,11 @@ def miel():
             "background_position": "center center",
             "background_repeat": "no-repeat",
             "background_overlay_background": "gradient",
-            "background_overlay_color": "rgba(10,9,8,0.55)",
-            "background_overlay_color_b": "rgba(10,9,8,0.90)",
+            # Voile renforce : a 0,55 en haut, la photo laissait passer
+            # des zones a #5E472B sous lesquelles ni le numero ni
+            # le descriptif ne tenaient 4,5:1.
+            "background_overlay_color": "rgba(10,9,8,0.70)",
+            "background_overlay_color_b": "rgba(10,9,8,0.92)",
             "background_overlay_gradient_type": "linear",
             "background_overlay_gradient_angle": t(180, "deg"),
         })

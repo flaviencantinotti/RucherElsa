@@ -133,9 +133,18 @@ Ce que le template porte déjà :
   d'effets : nom, description, adresse complète, courriel, fourchette de prix,
   et les trois miels en `Offer`. C'est ce qui permet à Google d'afficher
   l'atelier sur une recherche « miel Gordes » ou « apiculteur Vaucluse ».
-- **Contrastes conformes WCAG AA** : le crème est à 17,4:1 sur le noir, le
-  doré à 8,6:1. Les numéros de carte ont été éclaircis de `#7A4B23` à
-  `#B87A3D` — la valeur d'origine tombait à 2,6:1, sous le seuil de 4,5:1.
+- **Contrastes conformes WCAG AA**, mesurés sur le rendu réel et non sur du
+  noir plein : le fond des cartes de miel est une photo, et c'est elle qui
+  décide. Le voile a été renforcé de `0,55` à `0,70` en haut, et les numéros
+  éclaircis de `#7A4B23` à `#D0925D`, même teinte et même saturation. Sur les
+  cartes : numéro 4,6:1, descriptif 4,7:1, prix 5,3:1, titre 10,7:1. Ailleurs,
+  le crème est à 17,4:1 sur le noir et le doré à 8,6:1.
+
+  La mesure compte le 99ᵉ centile de luminance du fond, pas sa moyenne — une
+  moyenne sur une photo cache précisément les zones claires qui posent
+  problème. Le halo de la lampe torche est neutralisé pendant la mesure : il
+  se déplace avec le pointeur et éclaircit ce qu'il survole, ce qui fausserait
+  la lecture.
 - **Aucun lien mort** : 18 liens, toutes les ancres résolues.
 
 ### Textes alternatifs
