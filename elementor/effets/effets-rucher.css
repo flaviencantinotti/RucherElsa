@@ -1,0 +1,87 @@
+/* En-tete colle au defilement. position:sticky garde l'element dans le
+   flux : aucun decalage a compenser, contrairement a position:fixed. */
+.rdl-nav{position:sticky;top:0;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+
+/* Cartes de miel en hexagone, comme sur le site actuel. */
+.rdl-hexcard{
+  clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%);
+  transition:transform .4s ease,border-color .4s ease;}
+.rdl-hexcard:hover{transform:translateY(-6px);border-color:#DC9F2E!important;}
+@media(max-width:900px){
+  .rdl-hexcard{clip-path:none;border-radius:6px;}
+}
+
+/* En-tete. Le soulignement dore au survol et le menu deroulant sur
+   telephone n'ont pas d'equivalent au panneau : ils reprennent les regles
+   « .nav-links a::after » et « .burger » de index.html. */
+.rdl-menu a{position:relative;padding-bottom:4px;text-decoration:none;}
+.rdl-menu a::after{content:'';position:absolute;left:0;bottom:0;width:0;
+  height:1px;background:#DC9F2E;transition:width .3s ease;}
+.rdl-menu a:hover::after{width:100%;}
+/* Le burger est masque nativement partout. Il ne reapparait sur
+   telephone que si cette feuille s'applique, donc si le script qui
+   l'anime est la aussi : un burger sans script ne ferait rien. */
+@media(max-width:767px){
+  .rdl-burger{display:block!important;}
+}
+
+@media(max-width:767px){
+  .rdl-rangee{flex-direction:row!important;flex-wrap:wrap!important;
+    align-items:center!important;}
+  .rdl-marque{width:auto!important;flex:1 1 auto!important;}
+  .rdl-burger{display:block!important;}
+  .rdl-menu,.rdl-cta{display:none!important;width:100%!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu,
+  .rdl-nav.rdl-ouvert .rdl-cta{display:flex!important;}
+  .rdl-nav.rdl-ouvert .rdl-menu{padding-top:18px;}
+  .rdl-nav.rdl-ouvert .rdl-cta{padding-top:12px;
+    justify-content:flex-start!important;}
+  .rdl-cta .elementor-widget-button,
+  .rdl-cta .elementor-button-wrapper,
+  .rdl-cta .w-btnwrap{text-align:left!important;
+    justify-content:flex-start!important;}
+  .rdl-menu .elementor-icon-list-items,
+  .rdl-menu ul{flex-direction:column!important;align-items:flex-start!important;
+    gap:16px!important;}
+}
+
+/* Seconde moitie du H1 : italique doree, comme « .hero h1 em » dans
+   index.html. Le H1 reste une seule balise, donc une seule phrase pour
+   le referencement. */
+.rdl-h1 em{font-style:italic;color:#DC9F2E;}
+
+/* La lampe torche. Elle tenait dans trois <div> au fond du dernier
+   conteneur de la page. Un <div> en position:fixed depend de ses
+   ancetres : le moindre contexte d'empilement ou bloc conteneur sur un
+   conteneur Elementor le ramene a la boite de ce conteneur, donc en bas
+   de page — c'est le halo qui ne s'allumait qu'au pied de page. Deux
+   pseudo-elements de <body> n'ont aucun ancetre Elementor : leur bloc
+   conteneur est la fenetre, ou que soit pose le bloc d'effets. */
+body::before,body::after{content:'';position:fixed;inset:0;
+  pointer-events:none;}
+/* Trame hexagonale, vignette par-dessus : deux couches d'un meme fond.
+   L'opacite de la trame est passee dans le trait du SVG. */
+body::before{z-index:1;
+  background-image:radial-gradient(circle 460px at var(--rdl-x,50%)
+    var(--rdl-y,50%),transparent 0%,rgba(0,0,0,.35) 75%),
+    url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.18%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-repeat:no-repeat,repeat;
+  background-size:auto,52px 90px;}
+body::after{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
+  background:radial-gradient(circle 380px at var(--rdl-x,50%)
+  var(--rdl-y,50%),rgba(220,159,46,.45),rgba(220,159,46,.10) 40%,
+  transparent 70%);}
+/* Sans pointeur a suivre, le halo resterait fige au centre et la
+   vignette au milieu de l'ecran. Reste la trame seule. */
+@media (hover:none){
+  body::after{display:none;}
+  body::before{background-image:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.18%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    background-repeat:repeat;background-size:52px 90px;}
+}
+
+/* Le contenu passe devant la trame, le fond des sections reste
+   derriere : c'est le « z-index:2 » du .wrap de index.html. Les
+   sections gardent z-index:auto, sans quoi elles emprisonneraient
+   leur contenu sous la trame. */
+.elementor>.e-con>*{position:relative;z-index:2;}
