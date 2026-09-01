@@ -51,16 +51,37 @@
    le referencement. */
 .rdl-h1 em{font-style:italic;color:#DC9F2E;}
 
-/* Les trois calques de la lampe torche. */
-#rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;
+/* La lampe torche. Elle tenait dans trois <div> au fond du dernier
+   conteneur de la page. Un <div> en position:fixed depend de ses
+   ancetres : le moindre contexte d'empilement ou bloc conteneur sur un
+   conteneur Elementor le ramene a la boite de ce conteneur, donc en bas
+   de page — c'est le halo qui ne s'allumait qu'au pied de page. Deux
+   pseudo-elements de <body> n'ont aucun ancetre Elementor : leur bloc
+   conteneur est la fenetre, ou que soit pose le bloc d'effets. */
+body::before,body::after{content:'';position:fixed;inset:0;
   pointer-events:none;}
-#rdl-hexfield{z-index:1;opacity:.5;background-repeat:repeat;
-  background-size:52px 90px;background-image:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.35%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");}
-#rdl-vignette{z-index:1;background:radial-gradient(circle 460px at
-  var(--rdl-x,50%) var(--rdl-y,50%),transparent 0%,rgba(0,0,0,.35) 75%);}
-#rdl-glow{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
+/* Trame hexagonale, vignette par-dessus : deux couches d'un meme fond.
+   L'opacite de la trame est passee dans le trait du SVG. */
+body::before{z-index:1;
+  background-image:radial-gradient(circle 460px at var(--rdl-x,50%)
+    var(--rdl-y,50%),transparent 0%,rgba(0,0,0,.35) 75%),
+    url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.18%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-repeat:no-repeat,repeat;
+  background-size:auto,52px 90px;}
+body::after{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
   background:radial-gradient(circle 380px at var(--rdl-x,50%)
   var(--rdl-y,50%),rgba(220,159,46,.45),rgba(220,159,46,.10) 40%,
   transparent 70%);}
-/* Sans pointeur a suivre, le halo resterait fige au centre. */
-@media (hover:none){#rdl-glow,#rdl-vignette{display:none;}}
+/* Sans pointeur a suivre, le halo resterait fige au centre et la
+   vignette au milieu de l'ecran. Reste la trame seule. */
+@media (hover:none){
+  body::after{display:none;}
+  body::before{background-image:url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2752%27%20height%3D%2790%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27rgba%28220%2C159%2C46%2C0.18%29%27%20stroke-width%3D%271%27%3E%3Cpolygon%20points%3D%2726%2C2%2047%2C15%2047%2C42%2026%2C55%205%2C42%205%2C15%27%2F%3E%3Cpolygon%20points%3D%270%2C47%2021%2C60%2021%2C87%200%2C100%20-21%2C87%20-21%2C60%27%2F%3E%3Cpolygon%20points%3D%2752%2C47%2073%2C60%2073%2C87%2052%2C100%2031%2C87%2031%2C60%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    background-repeat:repeat;background-size:52px 90px;}
+}
+
+/* Le contenu passe devant la trame, le fond des sections reste
+   derriere : c'est le « z-index:2 » du .wrap de index.html. Les
+   sections gardent z-index:auto, sans quoi elles emprisonneraient
+   leur contenu sous la trame. */
+.elementor>.e-con>*{position:relative;z-index:2;}

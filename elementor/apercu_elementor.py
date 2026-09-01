@@ -311,13 +311,14 @@ def rendre(el, css, css_tab, css_mob, css_plage):
     if not conteneur:
         return rendre_widget(el, cl + (" " + sup if sup else ""))
 
+    cl = cl + " e-con"
     if sup:
         cl = cl + " " + sup
     dedans = "".join(rendre(e, css, css_tab, css_mob, css_plage) for e in el["elements"])
     if el["settings"].get("content_width") == "boxed":
         largeur = px(el["settings"].get("boxed_width")) or "1140px"
         aligne = el["settings"].get("flex_align_items") or "stretch"
-        interne = ("<div class='boxed' style=\"max-width:%s;align-items:%s;"
+        interne = ("<div class='boxed e-con-inner' style=\"max-width:%s;align-items:%s;"
                    "gap:%s\">%s</div>"
                    % (largeur, aligne,
                       px(el["settings"].get("flex_gap")) or "0px", dedans))
@@ -328,6 +329,7 @@ def rendre(el, css, css_tab, css_mob, css_plage):
 BASE = """
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#fff;}
+.e-con{position:relative;}
 img{max-width:100%;}
 .boxed{width:100%;margin:0 auto;display:flex;flex-direction:column;}
 .w-text p{margin:0 0 .6em;}
@@ -385,7 +387,7 @@ def construire(chemin_json):
     return ("<!DOCTYPE html><html lang='fr'><head><meta charset='utf-8'>"
             "<meta name='viewport' content='width=device-width,initial-scale=1'>"
             "<title>%s</title>%s"
-            "<style>%s</style></head><body>%s</body></html>"
+            "<style>%s</style></head><body><div class='elementor'>%s</div></body></html>"
             % (doc.get("title", "Aperçu"), lien, feuille, corps))
 
 

@@ -642,7 +642,7 @@ def gabarits():
 
 TRAME = (
     "<svg xmlns='http://www.w3.org/2000/svg' width='52' height='90'>"
-    "<g fill='none' stroke='rgba(220,159,46,0.35)' stroke-width='1'>"
+    "<g fill='none' stroke='rgba(220,159,46,0.18)' stroke-width='1'>"
     "<polygon points='26,2 47,15 47,42 26,55 5,42 5,15'/>"
     "<polygon points='0,47 21,60 21,87 0,100 -21,87 -21,60'/>"
     "<polygon points='52,47 73,60 73,87 52,100 31,87 31,60'/>"
@@ -709,19 +709,40 @@ EFFETS = """<style>
    le referencement. */
 .rdl-h1 em{font-style:italic;color:%(miel)s;}
 
-/* Les trois calques de la lampe torche. */
-#rdl-hexfield,#rdl-vignette,#rdl-glow{position:fixed;inset:0;
+/* La lampe torche. Elle tenait dans trois <div> au fond du dernier
+   conteneur de la page. Un <div> en position:fixed depend de ses
+   ancetres : le moindre contexte d'empilement ou bloc conteneur sur un
+   conteneur Elementor le ramene a la boite de ce conteneur, donc en bas
+   de page — c'est le halo qui ne s'allumait qu'au pied de page. Deux
+   pseudo-elements de <body> n'ont aucun ancetre Elementor : leur bloc
+   conteneur est la fenetre, ou que soit pose le bloc d'effets. */
+body::before,body::after{content:'';position:fixed;inset:0;
   pointer-events:none;}
-#rdl-hexfield{z-index:1;opacity:.5;background-repeat:repeat;
-  background-size:52px 90px;background-image:url("%(trame)s");}
-#rdl-vignette{z-index:1;background:radial-gradient(circle 460px at
-  var(--rdl-x,50%%) var(--rdl-y,50%%),transparent 0%%,rgba(0,0,0,.35) 75%%);}
-#rdl-glow{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
+/* Trame hexagonale, vignette par-dessus : deux couches d'un meme fond.
+   L'opacite de la trame est passee dans le trait du SVG. */
+body::before{z-index:1;
+  background-image:radial-gradient(circle 460px at var(--rdl-x,50%%)
+    var(--rdl-y,50%%),transparent 0%%,rgba(0,0,0,.35) 75%%),
+    url("%(trame)s");
+  background-repeat:no-repeat,repeat;
+  background-size:auto,52px 90px;}
+body::after{z-index:3;mix-blend-mode:screen;transition:opacity .4s ease;
   background:radial-gradient(circle 380px at var(--rdl-x,50%%)
   var(--rdl-y,50%%),rgba(220,159,46,.45),rgba(220,159,46,.10) 40%%,
   transparent 70%%);}
-/* Sans pointeur a suivre, le halo resterait fige au centre. */
-@media (hover:none){#rdl-glow,#rdl-vignette{display:none;}}
+/* Sans pointeur a suivre, le halo resterait fige au centre et la
+   vignette au milieu de l'ecran. Reste la trame seule. */
+@media (hover:none){
+  body::after{display:none;}
+  body::before{background-image:url("%(trame)s");
+    background-repeat:repeat;background-size:52px 90px;}
+}
+
+/* Le contenu passe devant la trame, le fond des sections reste
+   derriere : c'est le « z-index:2 » du .wrap de index.html. Les
+   sections gardent z-index:auto, sans quoi elles emprisonneraient
+   leur contenu sous la trame. */
+.elementor>.e-con>*{position:relative;z-index:2;}
 </style>
 <script type="application/ld+json">
 {
@@ -747,9 +768,6 @@ EFFETS = """<style>
   ]
 }
 </script>
-<div id="rdl-hexfield"></div>
-<div id="rdl-vignette"></div>
-<div id="rdl-glow"></div>
 <script>
 (function(){
   /* Dans l'editeur, trois calques fixes couvriraient le canevas. */
@@ -798,14 +816,17 @@ def effets():
 # partie : ils servaient d'echafaudage et devaient etre supprimes a la
 # main apres import, ce qui est vite oublie. Ils restent disponibles a
 # part, dans sections/gabarits.json, pour qui veut les inserer.
+# Le bloc d'effets vient en premier. En dernier, sa feuille de style
+# n'etait analysee qu'apres 3 800 px de contenu : la trame et le halo
+# n'apparaissaient qu'en fin de page, ou tres tard.
 SECTIONS = [
-    ("01-navigation", nav),
-    ("02-hero", hero),
-    ("03-histoire", histoire),
-    ("04-miel", miel),
-    ("05-pollinisation", pollinisation),
-    ("06-pied-de-page", pied),
-    ("07-effets", effets),
+    ("01-effets", effets),
+    ("02-navigation", nav),
+    ("03-hero", hero),
+    ("04-histoire", histoire),
+    ("05-miel", miel),
+    ("06-pollinisation", pollinisation),
+    ("07-pied-de-page", pied),
 ]
 
 EN_OPTION = [
@@ -872,20 +893,15 @@ if __name__ == "__main__":
     corps = EFFETS % {"miel": MIEL, "trame": trame_data_uri()}
     css = corps.split("<style>")[1].split("</style>")[0].strip()
     js = corps.split("<script>")[1].split("</script>")[0].strip()
-    calques = ("<div id=\"rdl-hexfield\"></div>\n"
-               "<div id=\"rdl-vignette\"></div>\n"
-               "<div id=\"rdl-glow\"></div>")
     dossier_e = os.path.join(ici, "effets")
     if not os.path.isdir(dossier_e):
         os.makedirs(dossier_e)
     for nom, contenu in [("effets-rucher.css", css),
-                         ("effets-rucher.js", js),
-                         ("calques-torche.html", calques)]:
+                         ("effets-rucher.js", js)]:
         with open(os.path.join(dossier_e, nom), "w", encoding="utf-8") as f:
             f.write(contenu + "\n")
     print("\nBloc d'effets, en fichiers separes")
-    for nom in ("effets-rucher.css", "effets-rucher.js",
-                "calques-torche.html"):
+    for nom in ("effets-rucher.css", "effets-rucher.js"):
         c = os.path.join(dossier_e, nom)
         print("  effets/%-24s %5.1f Ko" % (nom, os.path.getsize(c) / 1024))
 

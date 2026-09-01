@@ -11,7 +11,7 @@ s'importe sur une installation Elementor gratuite.
 | Fichier | Rôle |
 | --- | --- |
 | `rucher-accueil.json` | La page entière, 72 Ko — le fichier à importer |
-| `sections/` | Les 7 sections séparées, 5 à 16 Ko, si l'import complet cale |
+| `sections/` | Les 7 sections séparées, 6 à 14 Ko, si l'import complet cale |
 | `build_rucher.py` | Régénère le tout — palette en tête de fichier |
 | `verifier.py` | Contrôle le JSON avant import |
 | `apercu_elementor.py` | Rejoue le rendu en HTML, pour voir sans WordPress |
@@ -78,7 +78,9 @@ le découpage hexagonal des cartes de miel, l'en-tête qui suit le défilement,
 et la lampe torche — trame hexagonale, halo qui suit la souris, vignette.
 
 Elles sont toutes restituées, rassemblées dans **un unique widget HTML** placé
-en dernier conteneur de la page, sous l'identifiant `effets-rucher`.
+en **premier** conteneur de la page, sous l'identifiant `effets-rucher`.
+En dernier, sa feuille de style n'était lue qu'après 3 800 px de contenu :
+la trame et le halo n'apparaissaient qu'en fin de page.
 
 C'est un choix assumé, et d'une autre nature que du HTML dans les conteneurs
 de contenu : ce bloc n'affiche aucun texte, ne se rouvre jamais, et c'est
@@ -88,6 +90,14 @@ conteneurs de contenu, eux, restent en widgets natifs de bout en bout.
 Le reste passe par des réglages natifs : la classe `rdl-nav` et la classe
 `rdl-hexcard` sont posées depuis *Avancé → Classes CSS*, le fond translucide
 de l'en-tête et son z-index depuis le panneau.
+
+**La lampe torche ne pose plus de `<div>`.** Ses trois calques étaient des
+éléments `position:fixed` posés au fond du dernier conteneur ; un tel élément
+dépend de ses ancêtres, et le moindre contexte d'empilement sur un conteneur
+Elementor le ramène à la boîte de ce conteneur — d'où un halo qui ne
+s'allumait qu'au pied de page. Ce sont maintenant deux pseudo-éléments de
+`<body>`, sans aucun ancêtre Elementor : leur bloc conteneur est la fenêtre,
+où que soit posé le bloc d'effets.
 
 **La trame hexagonale est embarquée en data URI** dans la feuille de style :
 rien à envoyer dans la médiathèque, et WordPress n'a pas à être convaincu
@@ -103,7 +113,7 @@ il resterait figé au centre.
 d'origine. Sticky garde l'élément dans le flux : aucun décalage à compenser en
 haut de page, et cela évite la fonction *Sticky* d'Elementor, réservée à Pro.
 
-Si vous préférez une page sans une seule ligne de code, supprimez ce dernier
+Si vous préférez une page sans une seule ligne de code, supprimez ce premier
 conteneur : vous perdez les trois effets, tout le reste tient debout.
 
 Les apparitions au défilement, elles, sont natives : elles passent par

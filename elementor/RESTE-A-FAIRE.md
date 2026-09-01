@@ -13,8 +13,8 @@
 
 **2. Réimporter le template avec les photos.**
 - *Modèles → Modèles enregistrés* : supprimer les anciens imports du rucher,
-  y compris les huit entrées de type *Conteneur* (`01-navigation` à
-  `08-effets`) qui font doublon avec la page complète.
+  y compris les entrées de type *Conteneur* (`01-effets` à
+  `07-pied-de-page`) qui font doublon avec la page complète.
 - Importer `rucher-accueil.json` — la ligne de type **Page**.
 - Ouvrir la page, supprimer son contenu, puis icône dossier → *Mes modèles*.
 
@@ -64,7 +64,7 @@ est vendu en ligne un jour.
   (Fraunces, Manrope), Elementor les chargera normalement.
 - **L'aperçu** (`apercu_elementor.py`) approxime Elementor, il ne le remplace
   pas. Il attrape les fautes de structure, pas un décalage au pixel près.
-- **Le bloc d'effets** (8ᵉ conteneur) est le seul widget HTML de la page. Il
+- **Le bloc d'effets** (1ᵉʳ conteneur) est le seul widget HTML de la page. Il
   porte le découpage hexagonal, l'en-tête collant et la lampe torche. Le
   supprimer fait perdre ces trois effets, rien d'autre.
 
