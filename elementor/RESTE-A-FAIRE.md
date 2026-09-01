@@ -1,19 +1,19 @@
 # Reste à faire
 
-État au 1ᵉʳ septembre 2026. Le travail est fusionné dans `main`
-(`af46dcf`) ; `elementor-template` n'a plus de commit d'avance.
+Ce qui n'est pas dans le dépôt et qui se règle dans WordPress, plus les
+limites connues du template.
 
 ## À faire dans WordPress
 
 **1. Vérifier deux réglages Elementor avant d'importer.**
 - *Réglages → Fonctionnalités* → **Conteneur** doit être **actif**.
-- *Réglages → Éditeur Atomic* → doit être **désactivé**. C'était la cause du
-  « les conteneurs ne contiennent que du HTML » : l'éditeur atomique utilise
-  ses propres éléments et ne présente pas les conteneurs V3 comme modifiables.
+- *Réglages → Éditeur Atomic* → doit être **désactivé**. L'éditeur atomique
+  utilise ses propres éléments : il affiche le contenu des conteneurs V3
+  comme un bloc de code au lieu de widgets modifiables.
 
-**2. Réimporter le template avec les photos.**
-- *Modèles → Modèles enregistrés* : supprimer les anciens imports du rucher,
-  y compris les entrées de type *Conteneur* (`01-effets` à
+**2. Importer le template.**
+- *Modèles → Modèles enregistrés* : supprimer d'éventuels imports
+  antérieurs, y compris les entrées de type *Conteneur* (`01-effets` à
   `07-pied-de-page`) qui font doublon avec la page complète.
 - Importer `rucher-accueil.json` — la ligne de type **Page**.
 - Ouvrir la page, supprimer son contenu, puis icône dossier → *Mes modèles*.
@@ -23,21 +23,10 @@
 fournit sa propre navigation et son propre pied de page ; sans ce réglage,
 ceux du thème s'ajouteraient par-dessus.
 
-## À faire sur GitHub
+## Avant une mise en production
 
-~~**4. Supprimer l'ancienne branche.**~~ Fait. `RucherElsa` ne porte plus que
-`main` et `elementor-template`, et le travail est fusionné dans `main`.
-
-~~**5. Optionnel — TemplateTest.**~~ Fait. Les messages de commit sont
-nettoyés et poussés (`14c1d0d`). Même chose sur `cinevo` (`c138400`), où
-cinq commits étaient en plus *signés* d'un autre nom d'auteur. Dans les deux
-cas, arbres et dates d'auteur inchangés — seuls les messages et les
-identités ont bougé.
-
-## Avant la mise en ligne
-
-**6. Passer les images en médiathèque.** Elles sont servies depuis l'URL
-publique du dépôt, ce qui convient à un aperçu mais pas à un site en
+**4. Passer les images en médiathèque.** Elles sont servies depuis l'URL
+publique du dépôt, ce qui convient à une démonstration mais pas à un site en
 production : pas de cache maîtrisé, pas de tailles dérivées, et tout casse si
 le dépôt passe en privé. Envoyer les six fichiers de `elementor/images/` puis
 régénérer :
@@ -46,30 +35,33 @@ régénérer :
 python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
 ```
 
-**7. Sans objet tant que le projet reste une démonstration.** Le Rucher d'Elsa
-est un projet fictif, présenté comme tel sur le CV. Le téléphone
-`06 00 00 00 00` du pied de page n'a donc pas à être complété, et les
-mentions légales comme la politique de confidentialité n'ont personne à
-informer — leurs deux liens peuvent rester en `#`.
+**5. Contact et pages légales — sans objet ici.** Le Rucher d'Elsa est un
+projet de démonstration. Le téléphone `06 00 00 00 00` du pied de page est
+une valeur d'exemple, et les liens *Mentions légales* et *Politique de
+confidentialité* pointent vers `#`.
 
-Si le site devenait un jour celui d'une vraie exploitation, ces trois points
-redeviendraient obligatoires, la page de confidentialité d'autant plus si du
-miel s'y vendait.
+Pour une exploitation réelle, ces trois points redeviendraient obligatoires,
+la page de confidentialité d'autant plus si du miel s'y vendait en ligne.
 
 ## Écarts connus, assumés
 
-- **Les polices** n'ont pas pu être vérifiées visuellement : le proxy de la
-  session bloque Google Fonts. Les noms sont corrects dans le template
-  (Fraunces, Manrope), Elementor les chargera normalement.
-- **L'aperçu** (`apercu_elementor.py`) approxime Elementor, il ne le remplace
-  pas. Il attrape les fautes de structure, pas un décalage au pixel près.
+- **Les polices** n'ont pas été vérifiées à l'écran : Google Fonts n'était
+  pas joignable depuis l'environnement de développement. Les noms sont
+  corrects dans le template (Fraunces, Manrope), Elementor les chargera
+  normalement.
+- **L'aperçu** (`apercu_elementor.py`) rejoue les règles de mise en page
+  d'Elementor, il ne le remplace pas. Il attrape les fautes de structure —
+  débordement, colonne qui ne s'empile pas — pas un décalage au pixel près.
 - **Le bloc d'effets** (1ᵉʳ conteneur) est le seul widget HTML de la page. Il
-  porte le découpage hexagonal, l'en-tête collant et la lampe torche. Le
-  supprimer fait perdre ces trois effets, rien d'autre.
+  porte le découpage hexagonal des cartes, l'en-tête collant et la lampe
+  torche. Le supprimer fait perdre ces trois effets, rien d'autre.
 
-## Si l'import échoue de nouveau
+## Si l'import échoue
 
-Voir `DEPANNAGE.md`. Par ordre de fréquence : import lancé depuis l'éditeur au
+Par ordre de fréquence : import lancé depuis l'icône dossier de l'éditeur au
 lieu de l'admin, erreur 500 côté serveur (activer `WP_DEBUG_LOG` et lire
-`wp-content/debug.log`), fichier `.json` refusé à l'upload. Le dossier
-`sections/` permet d'importer section par section, de 5 à 16 Ko chacune.
+`wp-content/debug.log`), fichier `.json` refusé à l'upload par la
+configuration du site.
+
+En dernier recours, le dossier `sections/` permet d'importer la page section
+par section — de 6 à 14 Ko chacune, là où la page entière fait 65 Ko.
