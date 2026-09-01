@@ -28,11 +28,11 @@ ceux du thème s'ajouteraient par-dessus.
 ~~**4. Supprimer l'ancienne branche.**~~ Fait. `RucherElsa` ne porte plus que
 `main` et `elementor-template`, et le travail est fusionné dans `main`.
 
-**5. Optionnel — TemplateTest.** Le nettoyage des messages de commit du dépôt
-AnnaGreen a été fait en local mais le `push --force` a été refusé par le
-garde-fou de sécurité. La réécriture locale est perdue avec le conteneur ;
-elle se refait en une commande. Contenu des fichiers strictement identique,
-seuls les messages changent.
+~~**5. Optionnel — TemplateTest.**~~ Fait. Les messages de commit sont
+nettoyés et poussés (`14c1d0d`). Même chose sur `cinevo` (`c138400`), où
+cinq commits étaient en plus *signés* d'un autre nom d'auteur. Dans les deux
+cas, arbres et dates d'auteur inchangés — seuls les messages et les
+identités ont bougé.
 
 ## Avant la mise en ligne
 
