@@ -1,7 +1,7 @@
 # Reste à faire
 
-État au 31 août 2026, après audit complet. Branche
-`elementor-template`.
+État au 1ᵉʳ septembre 2026. Le travail est fusionné dans `main`
+(`af46dcf`) ; `elementor-template` n'a plus de commit d'avance.
 
 ## À faire dans WordPress
 
@@ -25,11 +25,8 @@ ceux du thème s'ajouteraient par-dessus.
 
 ## À faire sur GitHub
 
-**4. Supprimer l'ancienne branche.** `claude/wordpress-custom-template-fuks6v`
-existe encore dans RucherElsa. Le proxy réseau de la session refuse la
-suppression de branche distante, et l'API GitHub disponible n'expose pas
-l'outil. C'est un clic : onglet *Branches* → corbeille. Tant qu'elle existe,
-son nom et ses messages de commit restent visibles.
+~~**4. Supprimer l'ancienne branche.**~~ Fait. `RucherElsa` ne porte plus que
+`main` et `elementor-template`, et le travail est fusionné dans `main`.
 
 **5. Optionnel — TemplateTest.** Le nettoyage des messages de commit du dépôt
 AnnaGreen a été fait en local mais le `push --force` a été refusé par le
