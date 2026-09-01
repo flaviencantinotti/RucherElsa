@@ -46,13 +46,15 @@ régénérer :
 python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
 ```
 
-**7. Compléter le contact.** Le téléphone `06 00 00 00 00` du pied de page est
-une valeur d'exemple héritée de `index.html`. L'adresse et le courriel sont
-réels.
+**7. Sans objet tant que le projet reste une démonstration.** Le Rucher d'Elsa
+est un projet fictif, présenté comme tel sur le CV. Le téléphone
+`06 00 00 00 00` du pied de page n'a donc pas à être complété, et les
+mentions légales comme la politique de confidentialité n'ont personne à
+informer — leurs deux liens peuvent rester en `#`.
 
-**8. Mentions légales et confidentialité.** Les deux liens du pied de page
-pointent vers `#`. Ces pages sont obligatoires, et d'autant plus si le miel
-est vendu en ligne un jour.
+Si le site devenait un jour celui d'une vraie exploitation, ces trois points
+redeviendraient obligatoires, la page de confidentialité d'autant plus si du
+miel s'y vendait.
 
 ## Écarts connus, assumés
 
