@@ -85,5 +85,5 @@ chemins.
 ## Auteur
 
 **Flavien Cantinotti** — développeur web
-[GitHub](https://github.com/flaviencantinotti-ship-it) ·
+[GitHub](https://github.com/flaviencantinotti) ·
 [LinkedIn](https://www.linkedin.com/in/flavien-cantinotti/)

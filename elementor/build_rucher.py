@@ -44,9 +44,12 @@ UTILE = 1132.0
 # pointer la mediatheque WordPress : les images y sont servies avec les
 # bons en-tetes de cache et les tailles derivees.
 #   python3 build_rucher.py https://votre-site.fr/wp-content/uploads/2026/08/
+# Sur main, et non sur elementor-template : cette branche est desormais
+# entierement fusionnee, donc supprimable — et le jour ou elle le serait,
+# les six images du template disparaitraient.
 BASE_IMAGES = ("https://raw.githubusercontent.com/"
-               "flaviencantinotti-ship-it/RucherElsa/"
-               "elementor-template/elementor/images/")
+               "flaviencantinotti/RucherElsa/"
+               "main/elementor/images/")
 
 
 def photo(nom):
